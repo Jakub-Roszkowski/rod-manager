@@ -3,10 +3,15 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
 from django.core.validators import validate_email
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 
 class RegistrationView(APIView):
+    from rest_framework import permissions
+
+    class RegistrationView(APIView):
+        permission_classes = (AllowAny,)
+        
     def post(self, request):
         User = get_user_model()
         username = request.data.get("username")
