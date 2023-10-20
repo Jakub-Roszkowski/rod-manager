@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework_swagger",
     "rest_framework.authtoken",
+    "drf_yasg",
 ]
 
 MIDDLEWARE = [
@@ -127,4 +128,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
+    "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
 }

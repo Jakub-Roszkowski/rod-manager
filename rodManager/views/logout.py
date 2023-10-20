@@ -4,11 +4,19 @@ from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.permissions import IsAuthenticated
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 
 class LogoutView(APIView):
     permission_classes = (IsAuthenticated,)
 
+    @swagger_auto_schema(
+        request_body=None,
+        responses={
+            status.HTTP_200_OK: openapi.Response("Logout successful"),
+        },
+    )
     def post(self, request):
         logout(request)
         return Response(status=status.HTTP_200_OK)

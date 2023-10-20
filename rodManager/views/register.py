@@ -4,9 +4,28 @@ from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
 from django.core.validators import validate_email
 from rest_framework.permissions import IsAuthenticated
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 
 class RegistrationView(APIView):
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "username": openapi.Schema(type=openapi.TYPE_STRING),
+                "password": openapi.Schema(type=openapi.TYPE_STRING),
+                "email": openapi.Schema(type=openapi.TYPE_STRING),
+                "name": openapi.Schema(type=openapi.TYPE_STRING),
+                "surname": openapi.Schema(type=openapi.TYPE_STRING),
+            },
+            required=["username", "password", "email", "name", "surname"],
+        ),
+        responses={
+            status.HTTP_201_CREATED: openapi.Response("Registration successful"),
+            status.HTTP_400_BAD_REQUEST: openapi.Response("Bad Request"),
+        },
+    )
     def post(self, request):
         User = get_user_model()
         username = request.data.get("username")
