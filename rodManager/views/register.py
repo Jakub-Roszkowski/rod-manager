@@ -7,30 +7,21 @@ from rest_framework.permissions import IsAuthenticated
 
 
 class RegistrationView(APIView):
-    def get(self, request):
-        User = get_user_model()
-        users = User.objects.all()
-        return Response(
-            {
-                "users": [
-                    {"username": user.username, "email": user.email} for user in users
-                ]
-            }
-        )
-
     def post(self, request):
         User = get_user_model()
         username = request.data.get("username")
         password = request.data.get("password")
         email = request.data.get("email")
+        name = request.data.get("name")
+        surname = request.data.get("surname")
 
-        if not username or not password or not email:
+        if not username or not password or not email or not name or not surname:
             return Response(
-                {"error": "Username, password, and email are required."},
+                {"error": "Username, password, email, name and surname are required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        if not validate_email(email):
+        if validate_email(email):
             return Response(
                 {"error": "Email is not valid."},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -43,7 +34,11 @@ class RegistrationView(APIView):
             )
 
         user = User.objects.create_user(
-            username=username, password=password, email=email
+            username=username,
+            password=password,
+            email=email,
+            first_name=name,
+            last_name=surname,
         )
         return Response(
             {"message": "Registration successful."}, status=status.HTTP_201_CREATED
