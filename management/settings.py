@@ -133,3 +133,5 @@ REST_FRAMEWORK = {
 
 
 APPEND_SLASH = False
+
+AUTH_USER_MODEL = "models.Account"
