@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "rest_framework_simplejwt",
     "drf_yasg",
+    "rodManager"
 ]
 
 MIDDLEWARE = [
@@ -134,4 +135,4 @@ REST_FRAMEWORK = {
 
 APPEND_SLASH = False
 
-AUTH_USER_MODEL = "models.Account"
+AUTH_USER_MODEL = "rodManager.Account"

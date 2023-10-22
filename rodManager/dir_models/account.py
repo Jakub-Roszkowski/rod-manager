@@ -3,10 +3,12 @@ from django.db import models
 from rodManager.users.manager import CustomUserManager
 
 
-class Account(models.AbstractUser):
-    username = None
+from django.contrib.auth.models import AbstractUser
 
-    email = models.EmailField(primary_key=True, unique=True)
+class Account(AbstractUser):
+    username = None
+    REQUIRED_FIELDS = []
+    email = models.EmailField(unique=True)
     password = models.CharField(max_length=128)
     name = models.CharField(max_length=255)
     surname = models.CharField(max_length=255)
