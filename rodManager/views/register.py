@@ -19,11 +19,10 @@ class RegistrationView(APIView):
             properties={
                 "username": openapi.Schema(type=openapi.TYPE_STRING),
                 "password": openapi.Schema(type=openapi.TYPE_STRING),
-                "email": openapi.Schema(type=openapi.TYPE_STRING),
                 "name": openapi.Schema(type=openapi.TYPE_STRING),
                 "surname": openapi.Schema(type=openapi.TYPE_STRING),
             },
-            required=["username", "password", "email", "name", "surname"],
+            required=["username", "password", "name", "surname"],
         ),
         responses={
             status.HTTP_201_CREATED: openapi.Response("Registration successful"),
@@ -34,11 +33,11 @@ class RegistrationView(APIView):
         User = get_user_model()
         username = request.data.get("username")
         password = request.data.get("password")
-        email = request.data.get("email")
+        email = username
         name = request.data.get("name")
         surname = request.data.get("surname")
 
-        if not username or not password or not email or not name or not surname:
+        if not username or not password or not name or not surname:
             return Response(
                 {"error": "Username, password, email, name and surname are required."},
                 status=status.HTTP_400_BAD_REQUEST,
