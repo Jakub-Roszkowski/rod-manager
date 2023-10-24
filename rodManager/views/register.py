@@ -21,6 +21,7 @@ class RegistrationView(APIView):
                 "password": openapi.Schema(type=openapi.TYPE_STRING),
                 "name": openapi.Schema(type=openapi.TYPE_STRING),
                 "surname": openapi.Schema(type=openapi.TYPE_STRING),
+                "phone": openapi.Schema(type=openapi.TYPE_STRING),
             },
             required=["username", "password", "name", "surname"],
         ),
@@ -31,15 +32,15 @@ class RegistrationView(APIView):
     )
     def post(self, request):
         User = get_user_model()
-        username = request.data.get("username")
+        email = request.data.get("email")
         password = request.data.get("password")
-        email = username
         name = request.data.get("name")
         surname = request.data.get("surname")
+        phone = request.data.get("phone")
 
-        if not username or not password or not name or not surname:
+        if not email or not password or not name or not surname:
             return Response(
-                {"error": "Username, password, email, name and surname are required."},
+                {"error": "Email, password, name and surname are required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -49,18 +50,18 @@ class RegistrationView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        if User.objects.filter(username=username).exists():
+        if User.objects.filter(email=email).exists():
             return Response(
-                {"error": "Username already exists."},
+                {"error": "Email already exists."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         user = User.objects.create_user(
-            username=username,
-            password=password,
             email=email,
+            password=password,
             first_name=name,
             last_name=surname,
+            phone=phone,
         )
         return Response(
             {"message": "Registration successful."}, status=status.HTTP_201_CREATED
