@@ -17,12 +17,11 @@ class RegistrationView(APIView):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                "username": openapi.Schema(type=openapi.TYPE_STRING),
                 "password": openapi.Schema(type=openapi.TYPE_STRING),
-                "name": openapi.Schema(type=openapi.TYPE_STRING),
-                "surname": openapi.Schema(type=openapi.TYPE_STRING),
+                "first_name": openapi.Schema(type=openapi.TYPE_STRING),
+                "last_name": openapi.Schema(type=openapi.TYPE_STRING),
             },
-            required=["username", "password", "name", "surname"],
+            required=["password", "name", "surname"],
         ),
         responses={
             status.HTTP_201_CREATED: openapi.Response("Registration successful"),
@@ -31,15 +30,14 @@ class RegistrationView(APIView):
     )
     def post(self, request):
         User = get_user_model()
-        username = request.data.get("username")
         password = request.data.get("password")
-        email = username
-        name = request.data.get("name")
-        surname = request.data.get("surname")
+        email = request.data.get("email")
+        first_name = request.data.get("first_name")
+        last_name = request.data.get("last_name")
 
-        if not username or not password or not name or not surname:
+        if not email or not password or not first_name or not last_name:
             return Response(
-                {"error": "Username, password, email, name and surname are required."},
+                {"error": "Password, email, first_name and last_name are required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -49,18 +47,17 @@ class RegistrationView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        if User.objects.filter(username=username).exists():
+        if User.objects.filter(email=email).exists():
             return Response(
-                {"error": "Username already exists."},
+                {"error": "Email already exists."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         user = User.objects.create_user(
-            username=username,
             password=password,
             email=email,
-            first_name=name,
-            last_name=surname,
+            first_name=first_name,
+            last_name=last_name,
         )
         return Response(
             {"message": "Registration successful."}, status=status.HTTP_201_CREATED
