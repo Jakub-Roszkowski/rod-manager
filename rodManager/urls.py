@@ -20,7 +20,6 @@ schema_view = get_schema_view(
 
 
 from .views.register import *
-from .views.login import *
 from .views.logout import *
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -38,6 +37,6 @@ urlpatterns = [
     ),
     path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
     path("api/login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/register", RegistrationView.as_view(), name="register"),
+    path("api/register/", RegistrationView.as_view(), name="register"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]
