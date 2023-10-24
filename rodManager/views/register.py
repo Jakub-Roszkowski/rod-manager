@@ -7,6 +7,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import permissions
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 
 class RegistrationView(APIView):
@@ -63,6 +65,13 @@ class RegistrationView(APIView):
             last_name=surname,
             phone=phone,
         )
+        refresh = RefreshToken.for_user(user)
+        token_data = {
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+        }
+
         return Response(
-            {"message": "Registration successful."}, status=status.HTTP_201_CREATED
+            token_data,
+            status=status.HTTP_201_CREATED,
         )
