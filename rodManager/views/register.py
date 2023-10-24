@@ -12,8 +12,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 
 class RegistrationView(APIView):
-    class RegistrationView(APIView):
-        permission_classes = (AllowAny,)
+    permission_classes = (AllowAny,)
 
     @swagger_auto_schema(
         request_body=openapi.Schema(

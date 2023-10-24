@@ -1,5 +1,5 @@
 from rest_framework_simplejwt.views import  TokenObtainPairView
-from dir_models.account import Account
+from ..dir_models.account import Account
 
 class CustomLogin(TokenObtainPairView):
 
