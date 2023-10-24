@@ -19,12 +19,13 @@ class RegistrationView(APIView):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
+                "email": openapi.Schema(type=openapi.TYPE_STRING),
                 "password": openapi.Schema(type=openapi.TYPE_STRING),
                 "first_name": openapi.Schema(type=openapi.TYPE_STRING),
                 "last_name": openapi.Schema(type=openapi.TYPE_STRING),
                 "phone": openapi.Schema(type=openapi.TYPE_STRING),
             },
-            required=["password", "name", "surname"],
+            required=["email", "password", "name", "surname"],
         ),
         responses={
             status.HTTP_201_CREATED: openapi.Response("Registration successful"),
@@ -42,7 +43,7 @@ class RegistrationView(APIView):
 
         if not email or not password or not first_name or not last_name:
             return Response(
-                {"error": "Password, email, first_name and last_name are required."},
+                {"error": "Email, password, first_name and last_name are required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
