@@ -15,6 +15,10 @@ class CustomUserManager(BaseUserManager):
             raise ValueError(_("The Email must be set"))
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
+        if extra_fields["google_auth"] == True:
+            user.created_by_google = True
+            user.save()
+            return user
         user.set_password(password)
         user.save()
         return user

@@ -12,6 +12,7 @@ from django.contrib.auth.models import Group
 
 
 class AddPermsView(APIView):
+    permission_classes = (IsAuthenticated,)
     
     @swagger_auto_schema(
         request_body = openapi.Schema(
@@ -66,7 +67,7 @@ class AddPermsView(APIView):
         user = User.objects.get(email=email)
         user.groups.add(role)
         user.save()
-        
+
         return Response(
             {"success": "Role added successfully."},
             status=status.HTTP_201_CREATED,

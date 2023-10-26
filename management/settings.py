@@ -141,3 +141,8 @@ AUTH_USER_MODEL = "rodManager.Account"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
+
+
+# Google login app id
+
+GOOGLE_CLIENT_ID = ""
