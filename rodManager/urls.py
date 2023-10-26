@@ -5,6 +5,7 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from django.conf import settings
 from django.conf.urls.static import static
+from rodManager.users.google_signin import GoogleTokenLogin
 
 from rodManager.views.tokenobtain import CustomLogin
 
@@ -45,6 +46,7 @@ urlpatterns = [
     path("api/register/", RegistrationView.as_view(), name="register"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/image/", ImageView.as_view(), name="image"),
+    path("api/login/google/", GoogleTokenLogin.as_view(), name="google_login"),
 ]
 
 if settings.DEBUG:
