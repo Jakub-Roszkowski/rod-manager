@@ -14,5 +14,6 @@ class Account(AbstractUser):
     phone = models.CharField(max_length=20, blank=True, null=True)
     objects = CustomUserManager()
     created_by_google = models.BooleanField(default=False)
+
     def __str__(self):
         return self.email

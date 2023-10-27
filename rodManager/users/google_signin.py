@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from django.contrib.auth import get_user_model
 from rest_framework.request import Request
-from rest_framework.response import Response 
+from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import AllowAny
 from rest_framework import permissions
@@ -31,7 +31,6 @@ class GoogleTokenLogin(APIView):
         },
     )
     def post(self, request):
-
         User = get_user_model()
 
         token = request.data.get("token")
@@ -42,18 +41,17 @@ class GoogleTokenLogin(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-       
-        idinfo = id_token.verify_oauth2_token(token, requests.Request(), settings.GOOGLE_CLIENT_ID)
-        
-        
+        idinfo = id_token.verify_oauth2_token(
+            token, requests.Request(), settings.GOOGLE_CLIENT_ID
+        )
 
-        if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+        if idinfo["iss"] not in ["accounts.google.com", "https://accounts.google.com"]:
             return Response(
                 {"error": "Invalid token."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
- 
-        email = idinfo['email']
+
+        email = idinfo["email"]
 
         if not email:
             return Response(
@@ -71,8 +69,8 @@ class GoogleTokenLogin(APIView):
         else:
             User.objects.create_user(
                 email=email,
-                first_name=idinfo['given_name'],
-                last_name=idinfo['family_name'],
+                first_name=idinfo["given_name"],
+                last_name=idinfo["family_name"],
                 google_auth=True,
             )
             user = User.objects.get(email=email)
