@@ -11,8 +11,16 @@ class ImageView(APIView):
     @swagger_auto_schema(
         request_body=openapi.Schema(type=openapi.TYPE_FILE),
         responses={
-            status.HTTP_201_CREATED: openapi.Response("Image uploaded successfully"),
-            status.HTTP_400_BAD_REQUEST: openapi.Response("Error uploading image"),
+            201: openapi.Response(
+                description="Image uploaded successfully.",
+            ),
+            400: openapi.Response(
+                description="Bad request.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={"error": openapi.Schema(type=openapi.TYPE_STRING)},
+                ),
+            ),
         },
     )
     def post(self, request):
