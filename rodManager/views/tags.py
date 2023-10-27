@@ -6,7 +6,7 @@ from drf_yasg import openapi
 from rodManager.dir_models.tag import Tag
 from rest_framework.permissions import AllowAny
 from rest_framework.permissions import DjangoModelPermissions
-from rodManager.users.validate import validateUser
+from rodManager.users.validate import permission_required
 
 
 class TagView(APIView):
@@ -53,20 +53,17 @@ class TagView(APIView):
             ),
         },
     )
+    @permission_required("rodManager.add_tag")
     def post(self, request):
-        validate = validateUser(request, False, "rodManager.add_tag")
-        if validate:
-            return validate
-        else:
-            if request.data.get("name"):
-                name = request.data["name"]
-                if Tag.objects.filter(name=name).exists():
-                    tag = Tag.objects.get(name=name)
-                    tag.times_used += 1
-                    tag.save()
-                    return Response(status=status.HTTP_201_CREATED)
-                tag = Tag(name=name, times_used=0)
+        if request.data.get("name"):
+            name = request.data["name"]
+            if Tag.objects.filter(name=name).exists():
+                tag = Tag.objects.get(name=name)
+                tag.times_used += 1
                 tag.save()
                 return Response(status=status.HTTP_201_CREATED)
-            else:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
+            tag = Tag(name=name, times_used=0)
+            tag.save()
+            return Response(status=status.HTTP_201_CREATED)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
