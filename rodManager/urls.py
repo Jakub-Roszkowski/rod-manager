@@ -3,6 +3,11 @@ from rest_framework_swagger.views import get_swagger_view
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from django.conf import settings
+from django.conf.urls.static import static
+from rodManager.users.google_signin import GoogleTokenLogin
+
+from rodManager.views.tokenobtain import CustomLogin
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -20,8 +25,8 @@ schema_view = get_schema_view(
 
 
 from .views.register import *
-from .views.login import *
 from .views.logout import *
+from .views.image import *
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -37,7 +42,12 @@ urlpatterns = [
         name="schema-swagger-ui",
     ),
     path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
-    path("api/login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/register", RegistrationView.as_view(), name="register"),
+    path("api/login/", CustomLogin.as_view(), name="token_obtain_pair"),
+    path("api/register/", RegistrationView.as_view(), name="register"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("api/image/", ImageView.as_view(), name="image"),
+    path("api/login/google/", GoogleTokenLogin.as_view(), name="google_login"),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
