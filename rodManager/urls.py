@@ -26,7 +26,10 @@ schema_view = get_schema_view(
 
 from .views.register import *
 from .views.logout import *
+from .views.addperms import *
 from .views.image import *
+from .views.tags import *
+
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -47,6 +50,9 @@ urlpatterns = [
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/image/", ImageView.as_view(), name="image"),
     path("api/login/google/", GoogleTokenLogin.as_view(), name="google_login"),
+    path("api/logout/", LogoutView.as_view(), name="logout"),
+    path("api/addperms/", AddPermsView.as_view(), name="addperms"),
+    path("api/tag/", TagView.as_view(), name="tag"),
 ]
 
 if settings.DEBUG:
