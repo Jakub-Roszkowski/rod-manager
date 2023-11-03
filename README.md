@@ -21,14 +21,24 @@ python manage.py runserver
 
 ### Launch
 In the root folder of the project, run:
-```
-docker-compose build
-docker-compose up
+```shell
+docker-compose up -d --build 
 ```
 
-### Alternative with Jetbrains IDE
-- install docker plugin
-- open the project with the IDE
-- go to the docker-compose.yml file
-- right click on the green arrow next to "services"
+### Rebuild
+```shell
+docker-compose down
+docker-compose up -d --build 
+```
 
+### Production (almost) version with nginx
+
+```shell
+docker-compose -f docker-compose.prod.yml up -d --build  
+```
+
+### Rebuild production version
+```shell
+docker-compose -f docker-compose.prod.yml down
+docker-compose -f docker-compose.prod.yml up -d --build  
+```
