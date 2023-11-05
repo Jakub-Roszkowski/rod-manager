@@ -29,6 +29,7 @@ from .views.logout import *
 from .views.addperms import *
 from .views.image import *
 from .views.tags import *
+from .views.protectedfile import *
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -53,6 +54,11 @@ urlpatterns = [
     path("api/logout/", LogoutView.as_view(), name="logout"),
     path("api/addperms/", AddPermsView.as_view(), name="addperms"),
     path("api/tag/", TagView.as_view(), name="tag"),
+    path(
+        "api/protectedfile/<str:file_id>",
+        ProtectedFileView.as_view(),
+        name="protectedfile",
+    ),
 ]
 
 if settings.DEBUG:
