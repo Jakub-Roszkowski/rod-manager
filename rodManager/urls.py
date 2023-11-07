@@ -27,8 +27,8 @@ schema_view = get_schema_view(
 from .views.register import *
 from .views.logout import *
 from .views.addperms import *
-from .views.image import *
-from .views.tags import *
+from .views.announcements.image import *
+from .views.announcements.tags import *
 from .views.protectedfile import *
 
 from rest_framework_simplejwt.views import (
