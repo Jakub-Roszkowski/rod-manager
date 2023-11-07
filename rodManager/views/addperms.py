@@ -61,7 +61,7 @@ class AddPermsView(APIView):
             )
 
         user = User.objects.get(email=email)
-        user.groups.add(role)
+        user.groups.add(group)
         user.save()
 
         return Response(

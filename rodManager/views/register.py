@@ -24,11 +24,26 @@ class RegistrationView(APIView):
                 "last_name": openapi.Schema(type=openapi.TYPE_STRING),
                 "phone": openapi.Schema(type=openapi.TYPE_STRING),
             },
-            required=["email", "password", "name", "surname"],
+            required=["email", "password", "first_name", "last_name"],
         ),
         responses={
-            status.HTTP_201_CREATED: openapi.Response("Registration successful"),
-            status.HTTP_400_BAD_REQUEST: openapi.Response("Bad Request"),
+            201: openapi.Response(
+                description="User created successfully.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "refresh": openapi.Schema(type=openapi.TYPE_STRING),
+                        "access": openapi.Schema(type=openapi.TYPE_STRING),
+                    },
+                ),
+            ),
+            400: openapi.Response(
+                description="Bad request.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={"error": openapi.Schema(type=openapi.TYPE_STRING)},
+                ),
+            ),
         },
     )
     def post(self, request):
