@@ -145,4 +145,4 @@ MEDIA_URL = "/media/"
 
 # Google login app id
 
-GOOGLE_CLIENT_ID = ""
+GOOGLE_CLIENT_ID = "73743782996-985u8v5a33kj2jnb7e62k093k7gop8ri.apps.googleusercontent.com"
