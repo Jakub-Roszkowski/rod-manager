@@ -15,7 +15,17 @@ class TagView(APIView):
     @swagger_auto_schema(
         responses={
             201: openapi.Response(
-                description="Tag created successfully.",
+                description="List of tags.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Items(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            "name": openapi.Schema(type=openapi.TYPE_STRING),
+                            "times_used": openapi.Schema(type=openapi.TYPE_INTEGER),
+                        }
+                    ),
+                ),
             ),
             400: openapi.Response(
                 description="Bad request.",
