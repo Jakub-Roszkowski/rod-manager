@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('rodManager', '0004_image'),
+        ("rodManager", "0004_image"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='account',
-            name='created_by_google',
+            model_name="account",
+            name="created_by_google",
             field=models.BooleanField(default=False),
         ),
     ]
