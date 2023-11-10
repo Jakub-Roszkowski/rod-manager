@@ -27,7 +27,6 @@ schema_view = get_schema_view(
 from .views.register import *
 from .views.logout import *
 from .views.addperms import *
-from .views.announcements.image import *
 from .views.announcements.tags import *
 from .views.announcements.announcement import *
 from .views.protectedfile import *
