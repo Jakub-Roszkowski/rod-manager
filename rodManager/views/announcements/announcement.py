@@ -71,7 +71,6 @@ class AnnouncementView(APIView):
             properties={
                 "title": openapi.Schema(type=openapi.TYPE_STRING),
                 "body": openapi.Schema(type=openapi.TYPE_STRING),
-                "image": openapi.Schema(type=openapi.TYPE_STRING),
                 "tags": openapi.Schema(
                     type=openapi.TYPE_ARRAY,
                     items=openapi.Items(type=openapi.TYPE_STRING),
@@ -129,8 +128,6 @@ class AnnouncementView(APIView):
                 updated_html_code = str(soup)
                 print(updated_html_code)
                 announcement.body = updated_html_code
-            if request.data.get("image"):
-                announcement.image = request.data["image"]
             if request.data.get("tags"):
                 print(request.data["tags"])
                 if type(request.data["tags"]) is not list:
