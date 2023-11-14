@@ -1,22 +1,23 @@
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
-from rodManager.dir_models.tag import Tag
-from rest_framework.permissions import AllowAny
-from rest_framework.permissions import DjangoModelPermissions
-from rodManager.users.validate import permission_required
-from rodManager.dir_models.announcement import Announcement
-from django.core.files.base import ContentFile
-from rodManager.dir_models.image import Image
-from rodManager.dir_models.tag import Tag
-from bs4 import BeautifulSoup
 import base64
 import os
 import uuid
+
+from bs4 import BeautifulSoup
+from django.core.files.base import ContentFile
 from django.db.models import Count, Q
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import AllowAny, DjangoModelPermissions
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from rodManager.dir_models.announcement import Announcement
+from rodManager.dir_models.event import Event
+from rodManager.dir_models.image import Image
+from rodManager.dir_models.tag import Tag
+from rodManager.users.validate import permission_required
 
 
 class AnnouncementPagination(PageNumberPagination):
@@ -64,7 +65,18 @@ class AnnouncementView(APIView):
                                 type=openapi.TYPE_ARRAY,
                                 items=openapi.Items(type=openapi.TYPE_STRING),
                             ),
-                            "date": openapi.Schema(type=openapi.TYPE_STRING),
+                            "date": openapi.Schema(
+                                type=openapi.TYPE_STRING, format="date-time"
+                            ),
+                            "event": openapi.Schema(
+                                type=openapi.TYPE_OBJECT,
+                                properties={
+                                    "date": openapi.Schema(
+                                        type=openapi.TYPE_STRING, format="date-time"
+                                    ),
+                                    "name": openapi.Schema(type=openapi.TYPE_STRING),
+                                },
+                            ),
                         },
                     ),
                 ),
@@ -113,6 +125,12 @@ class AnnouncementView(APIView):
             for announcement in paginated_announcements
         ]
 
+        for announcement in serialized_announcements:
+            event = Event.objects.filter(announcement_id=announcement["id"]).first()
+            if event:
+                event_object = {"date": event.date, "name": event.name}
+                announcement["event"] = event_object
+
         return paginator.get_paginated_response(serialized_announcements)
 
     @swagger_auto_schema(
@@ -125,6 +143,15 @@ class AnnouncementView(APIView):
                 "tags": openapi.Schema(
                     type=openapi.TYPE_ARRAY,
                     items=openapi.Items(type=openapi.TYPE_STRING),
+                ),
+                "event": openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "date": openapi.Schema(
+                            type=openapi.TYPE_STRING, format="date-time"
+                        ),
+                        "name": openapi.Schema(type=openapi.TYPE_STRING),
+                    },
                 ),
             },
         ),
@@ -141,6 +168,7 @@ class AnnouncementView(APIView):
             ),
         },
     )
+    # @permission_required("rodManager.add_announcement")
     def post(self, request):
         if request.data.get("title"):
             title = request.data["title"]
@@ -149,32 +177,32 @@ class AnnouncementView(APIView):
             if request.data.get("body"):
                 soup = BeautifulSoup(request.data.get("body"), "html.parser")
                 img_tags = soup.find_all("img")
+                image_formats = {
+                    "jpeg": "jpg",
+                    "png": "png",
+                    "gif": "gif",
+                    "webp": "webp",
+                    "bmp": "bmp",
+                    "vnd.microsoft.icon": "ico",
+                    "tiff": "tiff",
+                }
                 for img_tag in img_tags:
                     src = img_tag["src"]
+                    for format_prefix, extension in image_formats.items():
+                        if src.startswith(f"data:image/{format_prefix};base64,"):
+                            base64_data = src[
+                                len(f"data:image/{format_prefix};base64,") :
+                            ]
 
-                    if src.startswith("data:image/jpeg;base64,"):
-                        base64_data = src[len("data:image/jpeg;base64,") :]
+                            filename = f"{uuid.uuid4()}.{extension}"
+                            image_data = base64.b64decode(base64_data)
+                            image_model_instance = Image(name=filename, file=filename)
+                            image_model_instance.file.save(
+                                filename, ContentFile(image_data), save=True
+                            )
 
-                        filename = "{}.jpg".format(uuid.uuid4())
-                        image_data = base64.b64decode(base64_data)
-                        image_model_instance = Image(name=filename, file=filename)
-                        image_model_instance.file.save(
-                            filename, ContentFile(image_data), save=True
-                        )
-
-                        img_tag["src"] = "/api/protectedfile/images/{}".format(filename)
-
-                    elif src.startswith("data:image/png;base64,"):
-                        base64_data = src[len("data:image/png;base64,") :]
-                        filename = "{}.png".format(uuid.uuid4())
-
-                        image_data = base64.b64decode(base64_data)
-                        image_model_instance = Image(name=filename, file=filename)
-                        image_model_instance.file.save(
-                            filename, ContentFile(image_data), save=True
-                        )
-
-                        img_tag["src"] = "/api/protectedfile/images/{}".format(filename)
+                            img_tag["src"] = f"/api/protectedfile/images/{filename}"
+                            break
 
                 updated_html_code = str(soup)
                 print(updated_html_code)
@@ -197,6 +225,17 @@ class AnnouncementView(APIView):
                         tag.save()
 
                     announcement.tags.add(tag)
+            if (
+                request.data.get("event")
+                and request.data["event"].get("date")
+                and request.data["event"].get("name")
+            ):
+                event = Event(
+                    announcement=announcement,
+                    date=request.data["event"]["date"],
+                    name=request.data["event"]["name"],
+                )
+                event.save()
 
             announcement.save()
             return Response(
