@@ -27,7 +27,7 @@ services:
     volumes:
       - ./mediafiles:/home/app/web/mediafiles
     ports:
-      - 1337:80
+      - 1337:1337
     depends_on:
       - web
 
