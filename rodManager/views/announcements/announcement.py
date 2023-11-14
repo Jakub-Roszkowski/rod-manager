@@ -15,11 +15,40 @@ from bs4 import BeautifulSoup
 import base64
 import os
 import uuid
+from django.db.models import Count, Q
+from rest_framework.pagination import PageNumberPagination
+
+
+class AnnouncementPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
+    max_page_size = 100
 
 
 class AnnouncementView(APIView):
     @swagger_auto_schema(
         operation_summary="Get a list of announcements",
+        manual_parameters=[
+            openapi.Parameter(
+                "tags",
+                openapi.IN_QUERY,
+                description="Tags to filter by.",
+                type=openapi.TYPE_ARRAY,
+                items=openapi.Items(type=openapi.TYPE_STRING),
+            ),
+            openapi.Parameter(
+                "page_size",
+                openapi.IN_QUERY,
+                description="Number of announcements per page.",
+                type=openapi.TYPE_INTEGER,
+            ),
+            openapi.Parameter(
+                "page",
+                openapi.IN_QUERY,
+                description="Page number.",
+                type=openapi.TYPE_INTEGER,
+            ),
+        ],
         responses={
             200: openapi.Response(
                 description="Announcements retrieved successfully.",
@@ -50,19 +79,41 @@ class AnnouncementView(APIView):
         },
     )
     def get(self, request):
-        announcements = Announcement.objects.all()
-        return Response(
-            [
-                {
-                    "id": announcement.id,
-                    "title": announcement.title,
-                    "body": announcement.body,
-                    "tags": [tag.name for tag in announcement.tags.all()],
-                    "date": announcement.date,
-                }
-                for announcement in announcements
-            ]
-        )
+        tags = request.GET.getlist("tags", [])
+        print(tags)
+        new_tags = []
+        for tag in tags:
+            new_tags.append(tag)
+
+        print(new_tags)
+        page_size = request.GET.get("page_size", 10000)
+        page_number = request.GET.get("page", 1)
+
+        if tags == []:
+            announcements = Announcement.objects.all()
+        else:
+            announcements = Announcement.objects.filter(tags__name__in=tags)
+
+        annotations = {"num_tags": Count("tags", filter=Q(tags__name__in=tags))}
+        announcements = announcements.annotate(**annotations)
+
+        announcements = announcements.order_by("-num_tags", "-date")
+
+        paginator = AnnouncementPagination()
+        paginated_announcements = paginator.paginate_queryset(announcements, request)
+
+        serialized_announcements = [
+            {
+                "id": announcement.id,
+                "title": announcement.title,
+                "body": announcement.body,
+                "tags": [tag.name for tag in announcement.tags.all()],
+                "date": announcement.date,
+            }
+            for announcement in paginated_announcements
+        ]
+
+        return paginator.get_paginated_response(serialized_announcements)
 
     @swagger_auto_schema(
         operation_summary="Create an announcement",
