@@ -32,6 +32,19 @@ from drf_yasg import openapi
 )   
 def create_garden(request):
     if "rodManager.createGarden" in request.user.get_all_permissions():
+        if not request.data.get("sector") or not request.data.get("avenue") or not request.data.get("number") or not request.data.get("area") or not request.data.get("status"):
+            return Response({"error": "Sector, avenue, number, area and status are required."})
+        
+        if request.data["status"] not in ["dostępna", "niedostępna"]:
+            return Response({"error": "Status must be dostępna or niedostępna."})
+        
+        if Garden.objects.filter(
+            sector=request.data["sector"],
+            avenue=request.data["avenue"],
+            number=request.data["number"],
+        ).exists():
+            return Response({"error": "Garden already exists."})
+        
         newgarden = Garden.objects.create(
             sector=request.data["sector"],
             avenue=request.data["avenue"],
