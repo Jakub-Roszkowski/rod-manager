@@ -7,7 +7,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from rodManager.users.google_signin import GoogleTokenLogin
 
-from rodManager.views.tokenobtain import CustomLogin
+from rodManager.views.login import CustomLogin
 
 schema_view = get_schema_view(
     openapi.Info(
