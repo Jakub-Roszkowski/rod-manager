@@ -25,6 +25,9 @@ class AnnouncementPagination(PageNumberPagination):
     page_size_query_param = "page_size"
     max_page_size = 100
 
+    def get_paginated_response(self, data):
+        return Response({"count": self.page.paginator.count, "results": data})
+
 
 class AnnouncementView(APIView):
     @swagger_auto_schema(
@@ -54,31 +57,41 @@ class AnnouncementView(APIView):
             200: openapi.Response(
                 description="Announcements retrieved successfully.",
                 schema=openapi.Schema(
-                    type=openapi.TYPE_ARRAY,
-                    items=openapi.Items(
-                        type=openapi.TYPE_OBJECT,
-                        properties={
-                            "id": openapi.Schema(type=openapi.TYPE_INTEGER),
-                            "title": openapi.Schema(type=openapi.TYPE_STRING),
-                            "body": openapi.Schema(type=openapi.TYPE_STRING),
-                            "tags": openapi.Schema(
-                                type=openapi.TYPE_ARRAY,
-                                items=openapi.Items(type=openapi.TYPE_STRING),
-                            ),
-                            "date": openapi.Schema(
-                                type=openapi.TYPE_STRING, format="date-time"
-                            ),
-                            "event": openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "count": openapi.Schema(type=openapi.TYPE_INTEGER),
+                        "results": openapi.Schema(
+                            type=openapi.TYPE_ARRAY,
+                            items=openapi.Items(
                                 type=openapi.TYPE_OBJECT,
                                 properties={
-                                    "date": openapi.Schema(
-                                        type=openapi.TYPE_STRING, format="date-time"
+                                    "id": openapi.Schema(type=openapi.TYPE_INTEGER),
+                                    "title": openapi.Schema(type=openapi.TYPE_STRING),
+                                    "body": openapi.Schema(type=openapi.TYPE_STRING),
+                                    "tags": openapi.Schema(
+                                        type=openapi.TYPE_ARRAY,
+                                        items=openapi.Items(type=openapi.TYPE_STRING),
                                     ),
-                                    "name": openapi.Schema(type=openapi.TYPE_STRING),
+                                    "date": openapi.Schema(
+                                        type=openapi.TYPE_STRING,
+                                        format="date-time",
+                                    ),
+                                    "event": openapi.Schema(
+                                        type=openapi.TYPE_OBJECT,
+                                        properties={
+                                            "date": openapi.Schema(
+                                                type=openapi.TYPE_STRING,
+                                                format="date-time",
+                                            ),
+                                            "name": openapi.Schema(
+                                                type=openapi.TYPE_STRING
+                                            ),
+                                        },
+                                    ),
                                 },
                             ),
-                        },
-                    ),
+                        ),
+                    },
                 ),
             ),
             400: openapi.Response(
