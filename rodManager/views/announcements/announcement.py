@@ -104,7 +104,7 @@ class AnnouncementView(APIView):
         },
     )
     def get(self, request):
-        tags = request.GET.getlist("tags", [])
+        tags = request.GET.get("tags", "").split(",")
         print(tags)
         new_tags = []
         for tag in tags:
@@ -113,12 +113,12 @@ class AnnouncementView(APIView):
         print(new_tags)
         page_size = request.GET.get("page_size", 10000)
         page_number = request.GET.get("page", 1)
-
+        print(tags)
         if tags == []:
             announcements = Announcement.objects.all()
         else:
             announcements = Announcement.objects.filter(tags__name__in=tags)
-
+        print(announcements)
         annotations = {"num_tags": Count("tags", filter=Q(tags__name__in=tags))}
         announcements = announcements.annotate(**annotations)
 
