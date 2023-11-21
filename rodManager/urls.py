@@ -7,7 +7,7 @@ from rest_framework import permissions
 from rest_framework_swagger.views import get_swagger_view
 
 from rodManager.users.google_signin import GoogleTokenLogin
-from rodManager.views.tokenobtain import CustomLogin
+from rodManager.views.login import CustomLogin
 
 schema_view = get_schema_view(
     openapi.Info(
