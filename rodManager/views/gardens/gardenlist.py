@@ -46,3 +46,21 @@ def garden_serializer(gardens, user):
                 temp["leaseholderID"] = garden.leaseholderID
             garden_list.append(temp)
     return garden_list
+
+
+@api_view(['get'])
+@swagger_auto_schema(
+    responses= openapi.Response(
+        description="Garden count.",
+        type=openapi.TYPE_OBJECT,
+        properties={
+            "count": openapi.Schema(type=openapi.TYPE_INTEGER),
+        },
+    ),
+    
+)
+def garden_count(request):
+    if request.user.is_authenticated:
+        return Response({"count": Garden.objects.count()})
+    else:
+        return Response({"error": "You don't have permission to view gardens."})
