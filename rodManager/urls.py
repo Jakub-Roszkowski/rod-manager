@@ -28,6 +28,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from .views.addperms import *
 from .views.announcements.announcement import *
+from .views.announcements.announcementbyid import *
 from .views.announcements.events import *
 from .views.announcements.tags import *
 from .views.logout import *
@@ -53,6 +54,11 @@ urlpatterns = [
     path("api/addperms/", AddPermsView.as_view(), name="addperms"),
     path("api/announcements/tag/", TagView.as_view(), name="tag"),
     path("api/announcements/event/", EventView.as_view(), name="event"),
+    path(
+        "api/announcements/<int:announcement_id>/",
+        AnnouncementByIdView.as_view(),
+        name="announcementbyid",
+    ),
     re_path(
         r"^api/protectedfile/(?P<file_path>.+)$",
         ProtectedFileView.as_view(),

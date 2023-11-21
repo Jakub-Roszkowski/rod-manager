@@ -34,12 +34,6 @@ class AnnouncementView(APIView):
         operation_summary="Get a list of announcements",
         manual_parameters=[
             openapi.Parameter(
-                "id",
-                openapi.IN_QUERY,
-                description="ID of announcement.",
-                type=openapi.TYPE_INTEGER,
-            ),
-            openapi.Parameter(
                 "tags",
                 openapi.IN_QUERY,
                 description="Tags to filter by.",
@@ -114,13 +108,10 @@ class AnnouncementView(APIView):
         tags = request.GET.get("tags", "").split(",")
         page_size = request.GET.get("page_size", 10000)
         page_number = request.GET.get("page", 1)
-        if id:
-            announcements = Announcement.objects.filter(id=id)
+        if tags == [""]:
+            announcements = Announcement.objects.all()
         else:
-            if tags == [""]:
-                announcements = Announcement.objects.all()
-            else:
-                announcements = Announcement.objects.filter(tags__name__in=tags)
+            announcements = Announcement.objects.filter(tags__name__in=tags)
         annotations = {"num_tags": Count("tags", filter=Q(tags__name__in=tags))}
         announcements = announcements.annotate(**annotations)
 
