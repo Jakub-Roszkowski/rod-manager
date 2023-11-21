@@ -66,18 +66,18 @@ class AnnouncementByIdView(APIView):
     def get(self, request, announcement_id):
         try:
             announcement = Announcement.objects.get(id=announcement_id)
-            return Response(
-                {
-                    "id": announcement.id,
-                    "title": announcement.title,
-                    "body": announcement.body,
-                    "tags": [tag.name for tag in announcement.tags.all()],
-                    "date": announcement.date,
-                    "event": {
-                        "date": announcement.event.date,
-                        "name": announcement.event.name,
-                    },
+            response_data = {
+                "id": announcement.id,
+                "title": announcement.title,
+                "body": announcement.body,
+                "tags": [tag.name for tag in announcement.tags.all()],
+                "date": announcement.date,
+            }
+            if hasattr(announcement, "event") and announcement.event:
+                response_data["event"] = {
+                    "date": announcement.event.date,
+                    "name": announcement.event.name,
                 }
-            )
+            return Response(response_data)
         except Announcement.DoesNotExist:
             return Response({"error": "Announcement does not exist."}, status=400)
