@@ -1,9 +1,9 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from dir_models.garden import Garden
+from rodManager.dir_models.garden import Garden
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-
+@api_view(['GET'])
 @swagger_auto_schema(
 request_body=openapi.Schema(
     type = openapi.TYPE_OBJECT,
@@ -19,7 +19,6 @@ responses= openapi.Response(
     items=openapi.Items(type=openapi.TYPE_OBJECT),
 )
 )
-@api_view(['GET'])
 def garden_in_bulk(request):
     if request.user.is_authenticated:
         gardens = Garden.objects.iterator()[request.GET["index"]:request.GET["index"]+request.GET["size"]]
@@ -27,7 +26,7 @@ def garden_in_bulk(request):
     else:
         return Response({"error": "You don't have permission to view gardens."})
                                   
-        
+@api_view(['post'])       
 @swagger_auto_schema(
     request_body= openapi.Schema(
         type=openapi.TYPE_OBJECT,
@@ -49,7 +48,6 @@ def garden_in_bulk(request):
         },
     ),
 )
-@api_view(['post'])
 def garden_by_id(request):
     if request.user.is_authenticated:
         if Garden.objects.filter(id=request.data["id"]).exists():

@@ -1,26 +1,18 @@
 
 from django.urls import include, path
 import os
+import rodManager.views.gardens.addgarden as addgarden
+import rodManager.views.gardens.deletegarden as deletegarden
+import rodManager.views.gardens.editgarden as editgarden
+import rodManager.views.gardens.gardenlist as gardenlist
+import rodManager.views.gardens.profilefromgarden as profilefromgarden
+import rodManager.views.gardens.getgarden as getgarden
 
-# Get the current directory path
-current_directory = os.path.dirname(__file__)
-
-# Add other URL patterns specific to this file
 urlpatterns = [
-    # Your URL patterns here
+    path("addgarden/", addgarden., name="addgarden"),
+    path("deletegarden/", deletegarden.DeleteGardenView.as_view(), name="deletegarden"),
+    path("editgarden/", editgarden.EditGardenView.as_view(), name="editgarden"),
+    path("gardenlist/", gardenlist.garden_list.as_view(), name="gardenlist"),
+    path("profilefromgarden/", profilefromgarden.profile_from_garden.as_view(), name="profilefromgarden"),
+    path("getgarden/id", getgarden.garden_by_id.as_view(), name="getgarden"),
 ]
-
-# Iterate over all files in the current directory
-for filename in os.listdir(current_directory):
-    # Exclude the current file itself
-    if filename != os.path.basename(__file__):
-        # Check if the file is a Python module
-        if filename.endswith('.py'):
-            # Remove the file extension to get the module name
-            module_name = os.path.splitext(filename)[0]
-            # Import the module dynamically
-            module = __import__(module_name, fromlist=['urlpatterns'])
-            # Add the module's urlpatterns to the main urlpatterns
-            urlpatterns += module.urlpatterns
-
-

@@ -1,6 +1,6 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from dir_models.garden import Garden
+from rodManager.dir_models.garden import Garden
 from django.core import serializers
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
