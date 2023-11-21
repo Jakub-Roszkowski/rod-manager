@@ -7,4 +7,4 @@ Pillow==10.1.0
 google-auth==2.23.3
 psycopg2-binary==2.9.6
 gunicorn==21.2.0
-
+beautifulsoup4==4.12.2

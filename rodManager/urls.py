@@ -1,12 +1,12 @@
-from django.urls import path, include, re_path
-from rest_framework_swagger.views import get_swagger_view
-from rest_framework import permissions
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
 from django.conf import settings
 from django.conf.urls.static import static
-from rodManager.users.google_signin import GoogleTokenLogin
+from django.urls import include, path, re_path
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework import permissions
+from rest_framework_swagger.views import get_swagger_view
 
+from rodManager.users.google_signin import GoogleTokenLogin
 from rodManager.views.login import CustomLogin
 
 schema_view = get_schema_view(
@@ -24,17 +24,16 @@ schema_view = get_schema_view(
 # from . import views
 
 
-from .views.register import *
-from .views.logout import *
-from .views.addperms import *
-from .views.announcements.image import *
-from .views.announcements.tags import *
-from .views.protectedfile import *
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
+from .views.addperms import *
+from .views.announcements.announcement import *
+from .views.announcements.announcementbyid import *
+from .views.announcements.events import *
+from .views.announcements.tags import *
+from .views.logout import *
+from .views.protectedfile import *
+from .views.register import *
 
 urlpatterns = [
     path(
@@ -49,13 +48,19 @@ urlpatterns = [
     path("api/login/", CustomLogin.as_view(), name="token_obtain_pair"),
     path("api/register/", RegistrationView.as_view(), name="register"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    path("api/image/", ImageView.as_view(), name="image"),
+    path("api/announcements/", AnnouncementView.as_view(), name="image"),
     path("api/login/google/", GoogleTokenLogin.as_view(), name="google_login"),
     path("api/logout/", LogoutView.as_view(), name="logout"),
     path("api/addperms/", AddPermsView.as_view(), name="addperms"),
-    path("api/tag/", TagView.as_view(), name="tag"),
+    path("api/announcements/tag/", TagView.as_view(), name="tag"),
+    path("api/announcements/event/", EventView.as_view(), name="event"),
     path(
-        "api/protectedfile/<str:file_id>",
+        "api/announcements/<int:announcement_id>/",
+        AnnouncementByIdView.as_view(),
+        name="announcementbyid",
+    ),
+    re_path(
+        r"^api/protectedfile/(?P<file_path>.+)$",
         ProtectedFileView.as_view(),
         name="protectedfile",
     ),

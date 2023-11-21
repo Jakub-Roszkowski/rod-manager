@@ -1,11 +1,11 @@
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
+from rest_framework.permissions import AllowAny, DjangoModelPermissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+
 from rodManager.dir_models.tag import Tag
-from rest_framework.permissions import AllowAny
-from rest_framework.permissions import DjangoModelPermissions
 from rodManager.users.validate import permission_required
 
 
@@ -38,6 +38,7 @@ class TagView(APIView):
     )
     def get(self, request):
         tags = Tag.objects.all()
+        tags = sorted(tags, key=lambda tag: tag.times_used, reverse=True)
         return Response(
             [{"name": tag.name, "times_used": tag.times_used} for tag in tags]
         )

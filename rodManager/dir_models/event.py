@@ -1,9 +1,8 @@
 from django.db import models
-from models.announcement import Announcement
 
 
-class Event(Announcement):
+class Event(models.Model):
     id = models.AutoField(primary_key=True)
-    event_date = models.DateTimeField()
-    location = models.CharField(max_length=255)
-    duration = models.IntegerField()
+    date = models.DateTimeField()
+    name = models.CharField(max_length=255)
+    announcement = models.OneToOneField("Announcement", on_delete=models.CASCADE)
