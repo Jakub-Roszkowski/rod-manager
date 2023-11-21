@@ -47,7 +47,7 @@ def garden_in_bulk(request):
             "area": openapi.Schema(type=openapi.TYPE_INTEGER),
             "status": openapi.Schema(type=openapi.TYPE_STRING),
         },
-    
+    ),
 )
 @api_view(['post'])
 def garden_by_id(request):
