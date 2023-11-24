@@ -6,13 +6,16 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from django.core import serializers
 from django.core.paginator import Paginator
+from rest_framework.pagination import PageNumberPagination
+
+
 
 
 @swagger_auto_schema(
     method="get",
     manual_parameters=[
-        openapi.Parameter("index",in_=openapi.IN_QUERY,type=openapi.TYPE_INTEGER),
-        openapi.Parameter("size",in_=openapi.IN_QUERY,type=openapi.TYPE_INTEGER),
+        openapi.Parameter("page",in_=openapi.IN_QUERY,type=openapi.TYPE_INTEGER),
+        openapi.Parameter("page_size",in_=openapi.IN_QUERY,type=openapi.TYPE_INTEGER),
     ],
 response= openapi.Response(
     description="Garden list.",
@@ -23,8 +26,8 @@ response= openapi.Response(
 @api_view(['GET'])
 def garden_in_bulk(request):
     if "rodManager.manageGardens" not in request.user.get_all_permissions():
-        index = int(request.GET["index"])
-        size = int(request.GET["size"])
+        index = int(request.GET["page"])-1
+        size = int(request.GET["page_size"])
         paginator = Paginator(Garden.objects.all().order_by('id'), size)
         gardens = paginator.get_page(index)
         return Response(serializers.serialize("json", gardens), status=status.HTTP_200_OK)
