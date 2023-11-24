@@ -1,11 +1,11 @@
-
-
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
+
 
 class PlotStatus(models.TextChoices):
-    AVAILABLE = 'dostępna', _('Available')
-    UNAVAILABLE = 'niedostępna', _('Unavailable')
+    AVAILABLE = "dostępna", _("Available")
+    UNAVAILABLE = "niedostępna", _("Unavailable")
+
 
 class Garden(models.Model):
     id = models.CharField(max_length=255, primary_key=True)

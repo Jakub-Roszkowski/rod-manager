@@ -31,6 +31,7 @@ from .views.announcements.announcement import *
 from .views.announcements.announcementbyid import *
 from .views.announcements.events import *
 from .views.announcements.tags import *
+from .views.gardenoffers.gardenoffer import *
 from .views.logout import *
 from .views.protectedfile import *
 from .views.register import *
@@ -59,6 +60,7 @@ urlpatterns = [
         AnnouncementByIdView.as_view(),
         name="announcementbyid",
     ),
+    path("api/gardenoffers/", GardenOfferView.as_view(), name="gardenoffers"),
     re_path(
         r"^api/protectedfile/(?P<file_path>.+)$",
         ProtectedFileView.as_view(),
