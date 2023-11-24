@@ -38,7 +38,7 @@ class GardenOfferView(APIView):
                 openapi.IN_QUERY,
                 description="Sort by.",
                 type=openapi.TYPE_STRING,
-                enum=["price", "area", "predicted_rent"],
+                enum=["created_at", "price", "predicted_rent"],
             ),
             openapi.Parameter(
                 "sort_order",
