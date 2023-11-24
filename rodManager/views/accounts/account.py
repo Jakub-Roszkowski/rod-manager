@@ -1,19 +1,10 @@
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from rodManager.dir_models.account import Account
-
-
-class AccountPagination(PageNumberPagination):
-    page_size = 10
-    page_size_query_param = "page_size"
-    max_page_size = 100
-
-    def get_paginated_response(self, data):
-        return Response({"count": self.page.paginator.count, "results": data})
+from rodManager.libs.rodpagitation import RODPagination
 
 
 class AccountView(APIView):
@@ -74,12 +65,9 @@ class AccountView(APIView):
         },
     )
     def get(self, request):
-        page_size = request.GET.get("page_size", 10000)
-        page_number = request.GET.get("page", 1)
-
         accounts = Account.objects.all()
 
-        paginator = AccountPagination()
+        paginator = RODPagination()
         paginated_accounts = paginator.paginate_queryset(accounts, request)
 
         serialized_accounts = [

@@ -8,7 +8,6 @@ from django.db.models import Count, Q
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, DjangoModelPermissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -17,16 +16,8 @@ from rodManager.dir_models.account import Account
 from rodManager.dir_models.garden import Garden
 from rodManager.dir_models.gardenoffers import GardenOffers
 from rodManager.dir_models.image import Image
+from rodManager.libs.rodpagitation import RODPagination
 from rodManager.users.validate import permission_required
-
-
-class GardenOfferPagination(PageNumberPagination):
-    page_size = 10
-    page_size_query_param = "page_size"
-    max_page_size = 100
-
-    def get_paginated_response(self, data):
-        return Response({"count": self.page.paginator.count, "results": data})
 
 
 class GardenOfferView(APIView):
@@ -200,7 +191,7 @@ class GardenOfferView(APIView):
         else:
             garden_offers = garden_offers.order_by(sort_by)
 
-        paginator = GardenOfferPagination()
+        paginator = RODPagination()
         paginated_garden_offers = paginator.paginate_queryset(garden_offers, request)
 
         serialized_garden_offers = [
