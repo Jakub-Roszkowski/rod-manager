@@ -8,7 +8,6 @@ from django.db.models import Count, Q
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, DjangoModelPermissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -17,16 +16,8 @@ from rodManager.dir_models.announcement import Announcement
 from rodManager.dir_models.event import Event
 from rodManager.dir_models.image import Image
 from rodManager.dir_models.tag import Tag
+from rodManager.libs.rodpagitation import RODPagination
 from rodManager.users.validate import permission_required
-
-
-class AnnouncementPagination(PageNumberPagination):
-    page_size = 10
-    page_size_query_param = "page_size"
-    max_page_size = 100
-
-    def get_paginated_response(self, data):
-        return Response({"count": self.page.paginator.count, "results": data})
 
 
 class AnnouncementView(APIView):
@@ -116,7 +107,7 @@ class AnnouncementView(APIView):
 
         announcements = announcements.order_by("-num_tags", "-date")
 
-        paginator = AnnouncementPagination()
+        paginator = RODPagination()
         paginated_announcements = paginator.paginate_queryset(announcements, request)
 
         serialized_announcements = [
