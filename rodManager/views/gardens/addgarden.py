@@ -1,13 +1,14 @@
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from dir_models.garden import Garden
+from rodManager.dir_models.garden import Garden
 from django.core import serializers
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-@api_view(['POST'])
+
 @swagger_auto_schema(
+    method="post",
     responses={
         201: openapi.Response(
             description="Garden created.",
@@ -29,7 +30,8 @@ from drf_yasg import openapi
             ),
         ),
     },
-)   
+)
+@api_view(['POST'])
 def create_garden(request):
     if "rodManager.createGarden" in request.user.get_all_permissions():
         if not request.data.get("sector") or not request.data.get("avenue") or not request.data.get("number") or not request.data.get("area") or not request.data.get("status"):

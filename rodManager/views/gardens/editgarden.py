@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from dir_models.garden import Garden
+from rodManager.dir_models.garden import Garden
 
 class EditGardenView(APIView):
 

@@ -2,7 +2,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from dir_models.garden import Garden
+from rodManager.dir_models.garden import Garden
 
 class DeleteGardenView(APIView):
     def delete(self, request):
