@@ -38,7 +38,7 @@ class GardenOfferView(APIView):
                 openapi.IN_QUERY,
                 description="Sort by.",
                 type=openapi.TYPE_STRING,
-                enum=["created_at", "price", "predicted_rent"],
+                enum=["created_at", "area", "price", "predicted_rent"],
             ),
             openapi.Parameter(
                 "sort_order",
@@ -173,10 +173,10 @@ class GardenOfferView(APIView):
         sort_by = request.GET.get("sort_by", "created_at")
         sort_order = request.GET.get("sort_order", "desc")
 
-        if sort_by not in ["created_at", "price", "predicted_rent"]:
+        if sort_by not in ["created_at", "area", "price", "predicted_rent"]:
             return Response(
                 {
-                    "error": "Invalid sort_by parameter. (created_at, price, predicted_rent)"
+                    "error": "Invalid sort_by parameter. (created_at, area, price, predicted_rent)"
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
