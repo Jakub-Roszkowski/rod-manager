@@ -52,7 +52,7 @@ urlpatterns = [
         ProtectedFileView.as_view(),
         name="protectedfile",
     ),
-    path("api/garden/", include("rodManager.views.gardens.urls")),
+    path("api/gardens/", include("rodManager.views.gardens.urls")),
     path("api/garden-offers/", include("rodManager.views.gardenoffers.urls")),
     path("api/announcements/", include("rodManager.views.announcements.urls")),
 ]
