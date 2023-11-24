@@ -1,10 +1,11 @@
-
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import status
+
 from rodManager.dir_models.garden import Garden
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+
 
 @swagger_auto_schema(
     method="delete",
@@ -35,12 +36,19 @@ from drf_yasg import openapi
         ),
     },
 )
-@api_view(['DELETE'])
-def delete_garden( request):
+@api_view(["DELETE"])
+def delete_garden(request):
     if "rodManager.manageGardens" not in request.user.get_all_permissions():
-        return Response({"error": "You don't have permission to delete gardens."}, status=status.HTTP_403_FORBIDDEN)
+        return Response(
+            {"error": "You don't have permission to delete gardens."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
     if Garden.objects.filter(id=request.data["id"]).exists():
         Garden.objects.get(id=request.data["id"]).delete()
-        return Response({"success": "Garden deleted successfully."}, status=status.HTTP_200_OK)
+        return Response(
+            {"success": "Garden deleted successfully."}, status=status.HTTP_200_OK
+        )
     else:
-        return Response({"error": "Garden doesn't exist."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"error": "Garden doesn't exist."}, status=status.HTTP_400_BAD_REQUEST
+        )

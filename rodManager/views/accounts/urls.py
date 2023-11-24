@@ -1,6 +1,4 @@
-import os
-
-from django.urls import include, path
+from django.urls import path
 
 import rodManager.views.accounts.account as account
 import rodManager.views.accounts.accountbyid as accountbyid

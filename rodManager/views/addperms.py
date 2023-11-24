@@ -1,13 +1,12 @@
-from drf_yasg import openapi
-from rest_framework.views import APIView
-from rest_framework import status
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
-from drf_yasg.utils import swagger_auto_schema
-from rest_framework.permissions import IsAuthenticated
-from rest_framework import permissions
-from django.contrib.auth.models import Group
+from rest_framework.views import APIView
 
 
 class AddPermsView(APIView):

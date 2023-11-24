@@ -1,8 +1,5 @@
 from django.db import models
 
-from .account import Account
-from .garden import Garden
-
 
 class GardenOffers(models.Model):
     id = models.AutoField(primary_key=True)

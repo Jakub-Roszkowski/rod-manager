@@ -1,8 +1,11 @@
-from rest_framework_simplejwt.views import TokenObtainPairView
-from ..dir_models.account import Account
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+from ..dir_models.account import Account
+
+
 class CustomLogin(TokenObtainPairView):
     @swagger_auto_schema(
         request_body=openapi.Schema(

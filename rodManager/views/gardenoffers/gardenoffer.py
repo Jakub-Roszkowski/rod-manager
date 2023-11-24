@@ -1,14 +1,11 @@
 import base64
-import os
 import uuid
 
 from bs4 import BeautifulSoup
 from django.core.files.base import ContentFile
-from django.db.models import Count, Q
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.permissions import AllowAny, DjangoModelPermissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -17,7 +14,6 @@ from rodManager.dir_models.garden import Garden
 from rodManager.dir_models.gardenoffers import GardenOffers
 from rodManager.dir_models.image import Image
 from rodManager.libs.rodpagitation import RODPagination
-from rodManager.users.validate import permission_required
 
 
 class GardenOfferView(APIView):

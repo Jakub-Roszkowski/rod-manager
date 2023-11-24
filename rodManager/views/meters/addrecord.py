@@ -1,10 +1,11 @@
-
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import status
+
 from rodManager.dir_models.meter import Meter
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+
 
 @swagger_auto_schema(
     request_body=openapi.Schema(
@@ -30,15 +31,23 @@ from drf_yasg import openapi
         ),
     },
 )
-@api_view(['POST'])
+@api_view(["POST"])
 def add_record(request):
     if "rodManager.manageRecords" in request.user.get_all_permissions():
         if not request.data["id"] or not request.data["type"]:
-            return Response({"error": "ID and type are required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "ID and type are required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         if not request.data["adress"] and not request.data["garden"]:
-            return Response({"error": "Adress or garden are required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Adress or garden are required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         if Meter.objects.filter(id=request.data["id"]).exists():
-            return Response({"error": "Meter already exists"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Meter already exists"}, status=status.HTTP_400_BAD_REQUEST
+            )
         newmeter = Meter.objects.create(
             id=request.data["id"],
             type=request.data["type"],
@@ -46,4 +55,6 @@ def add_record(request):
             garden=request.data["garden"],
         )
         newmeter.save()
-        return Response({"success": "Meter added successfully"}, status=status.HTTP_201_CREATED)
+        return Response(
+            {"success": "Meter added successfully"}, status=status.HTTP_201_CREATED
+        )

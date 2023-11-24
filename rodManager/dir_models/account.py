@@ -1,9 +1,7 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 from rodManager.users.manager import CustomUserManager
-
-
-from django.contrib.auth.models import AbstractUser
 
 
 class Account(AbstractUser):

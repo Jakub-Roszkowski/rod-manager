@@ -1,6 +1,4 @@
-import os
-
-from django.urls import include, path
+from django.urls import path
 
 import rodManager.views.announcements.announcement as announcement
 import rodManager.views.announcements.announcementbyid as announcementbyid

@@ -11,8 +11,6 @@ from rodManager.dir_models.gardenoffers import GardenOffers
 
 
 class GardenOfferMinMaxVakuesView(APIView):
-    permission_classes = [AllowAny]
-
     @swagger_auto_schema(
         responses={
             200: openapi.Response(

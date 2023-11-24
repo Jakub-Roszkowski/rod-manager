@@ -1,6 +1,4 @@
-import os
-
-from django.urls import include, path
+from django.urls import path
 
 import rodManager.views.gardenoffers.availablegardens as availablegardens
 import rodManager.views.gardenoffers.contact as contact
