@@ -54,7 +54,7 @@ urlpatterns = [
     ),
     path("api/garden/", include("rodManager.views.gardens.urls")),
     path("api/garden-offers/", include("rodManager.views.gardenoffers.urls")),
-    path("api/announcement/", include("rodManager.views.announcements.urls")),
+    path("api/announcements/", include("rodManager.views.announcements.urls")),
 ]
 
 if settings.DEBUG:
