@@ -10,9 +10,10 @@ import rodManager.views.gardens.getgarden as getgarden
 
 urlpatterns = [
     path("addgarden/", addgarden.create_garden, name="addgarden"),
-    path("deletegarden/", deletegarden.DeleteGardenView.as_view(), name="deletegarden"),
-    path("editgarden/", editgarden.EditGardenView.as_view(), name="editgarden"),
+    path("deletegarden/", deletegarden.delete_garden, name="deletegarden"),
+    path("editgarden/", editgarden.edit_garden, name="editgarden"),
     path("gardenlist/", gardenlist.garden_list, name="gardenlist"),
     path("profilefromgarden/", profilefromgarden.profile_from_garden, name="profilefromgarden"),
-    path("getgarden/id", getgarden.garden_by_id, name="getgarden"),
+    path("getgarden/id/", getgarden.garden_by_id, name="getgarden"),
+    path("bulkgarden/",getgarden.garden_in_bulk, name="bulkgarden")
 ]

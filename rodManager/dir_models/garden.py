@@ -3,8 +3,8 @@
 from django.db import models
 
 class PlotStatus(models.TextChoices):
-    AVAILABLE = 'dostępna'
-    UNAVAILABLE = 'niedostępna'
+    AVAILABLE = 'dostepna'
+    UNAVAILABLE = 'niedostepna'
 
 class Garden(models.Model):
     id = models.CharField(max_length=255, primary_key=True)

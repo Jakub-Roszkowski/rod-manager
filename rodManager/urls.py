@@ -59,7 +59,7 @@ urlpatterns = [
         ProtectedFileView.as_view(),
         name="protectedfile",
     ),
-    path("garden/", include("rodManager.views.gardens.urls")),
+    path("api/garden/", include("rodManager.views.gardens.urls")),
 ]
 
 if settings.DEBUG:

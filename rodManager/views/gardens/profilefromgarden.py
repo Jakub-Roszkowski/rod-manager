@@ -6,16 +6,14 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
 
-@api_view(['POST'])
+
 @swagger_auto_schema(
-    request_body=openapi.Schema(
-        type = openapi.TYPE_OBJECT,
-        properties= {
-            "id": openapi.Schema(type=openapi.TYPE_INTEGER),
-        },
-        required=["id"],
-    ),
-    responses= openapi.Response(
+    methods=["GET"],
+    manual_parameters=
+    [
+        openapi.Parameter("id",in_=openapi.IN_QUERY,type=openapi.TYPE_INTEGER)
+    ],
+    response= openapi.Response(
         description="Account",
         type = openapi.TYPE_OBJECT,
         properties = {
@@ -26,8 +24,9 @@ from drf_yasg.utils import swagger_auto_schema
         },
 ),
 )
+@api_view(['GET'])
 def profile_from_garden(request):
-    if request.user.is_authenticated:
+    if "rodManager.manageGardens" in request.user.get_all_permissions():
         if Garden.objects.filter(id=request.data["id"]).exists():
             garden = Garden.objects.get(id=request.data["id"])
             return Response(garden)
