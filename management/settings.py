@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
 from pathlib import Path
-import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -83,14 +82,14 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
-    # },
-    # "postgres": {
-    #     "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-    #     "NAME": os.environ.get("SQL_DATABASE", BASE_DIR / "db.sqlite3"),
-    #     "USER": os.environ.get("SQL_USER", "user"),
-    #     "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
-    #     "HOST": os.environ.get("SQL_HOST", "localhost"),
-    #     "PORT": os.environ.get("SQL_PORT", "5432"),
+        # },
+        # "postgres": {
+        #     "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+        #     "NAME": os.environ.get("SQL_DATABASE", BASE_DIR / "db.sqlite3"),
+        #     "USER": os.environ.get("SQL_USER", "user"),
+        #     "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+        #     "HOST": os.environ.get("SQL_HOST", "localhost"),
+        #     "PORT": os.environ.get("SQL_PORT", "5432"),
     }
 }
 
@@ -152,10 +151,12 @@ APPEND_SLASH = False
 AUTH_USER_MODEL = "rodManager.Account"
 
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "mediafiles")
+MEDIA_URL = "/mediafiles/"
 
 
 # Google login app id
 
-GOOGLE_CLIENT_ID = "73743782996-985u8v5a33kj2jnb7e62k093k7gop8ri.apps.googleusercontent.com"
+GOOGLE_CLIENT_ID = (
+    "73743782996-985u8v5a33kj2jnb7e62k093k7gop8ri.apps.googleusercontent.com"
+)

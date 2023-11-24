@@ -1,11 +1,11 @@
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
+from rest_framework.permissions import AllowAny, DjangoModelPermissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+
 from rodManager.dir_models.tag import Tag
-from rest_framework.permissions import AllowAny
-from rest_framework.permissions import DjangoModelPermissions
 from rodManager.users.validate import permission_required
 
 
@@ -15,7 +15,17 @@ class TagView(APIView):
     @swagger_auto_schema(
         responses={
             201: openapi.Response(
-                description="Tag created successfully.",
+                description="List of tags.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Items(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            "name": openapi.Schema(type=openapi.TYPE_STRING),
+                            "times_used": openapi.Schema(type=openapi.TYPE_INTEGER),
+                        }
+                    ),
+                ),
             ),
             400: openapi.Response(
                 description="Bad request.",
@@ -28,6 +38,7 @@ class TagView(APIView):
     )
     def get(self, request):
         tags = Tag.objects.all()
+        tags = sorted(tags, key=lambda tag: tag.times_used, reverse=True)
         return Response(
             [{"name": tag.name, "times_used": tag.times_used} for tag in tags]
         )
