@@ -32,6 +32,7 @@ from .views.announcements.announcementbyid import *
 from .views.announcements.events import *
 from .views.announcements.tags import *
 from .views.gardenoffers.gardenoffer import *
+from .views.gardenoffers.getminandmax import *
 from .views.logout import *
 from .views.protectedfile import *
 from .views.register import *
@@ -61,6 +62,11 @@ urlpatterns = [
         name="announcementbyid",
     ),
     path("api/garden-offers/", GardenOfferView.as_view(), name="gardenoffers"),
+    path(
+        "api/garden-offers/min-max/",
+        GardenOfferMinMaxVakuesView.as_view(),
+        name="gardenoffersminmax",
+    ),
     re_path(
         r"^api/protectedfile/(?P<file_path>.+)$",
         ProtectedFileView.as_view(),
