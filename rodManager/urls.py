@@ -7,7 +7,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from rodManager.users.google_signin import GoogleTokenLogin
 
-from rodManager.views.login import CustomLogin
+from rodManager.views.tokenobtain import CustomLogin
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -59,6 +59,7 @@ urlpatterns = [
         ProtectedFileView.as_view(),
         name="protectedfile",
     ),
+    path("garden/", include("rodManager.views.gardens.urls")),
 ]
 
 if settings.DEBUG:
