@@ -34,6 +34,20 @@ class GardenOfferView(APIView):
         operation_summary="Get a list of garden offers",
         manual_parameters=[
             openapi.Parameter(
+                "sort_by",
+                openapi.IN_QUERY,
+                description="Sort by.",
+                type=openapi.TYPE_STRING,
+                enum=["price", "area", "predicted_rent"],
+            ),
+            openapi.Parameter(
+                "sort_order",
+                openapi.IN_QUERY,
+                description="Sort order.",
+                type=openapi.TYPE_STRING,
+                enum=["asc", "desc"],
+            ),
+            openapi.Parameter(
                 "price_min",
                 openapi.IN_QUERY,
                 description="Minimum price.",
@@ -156,6 +170,21 @@ class GardenOfferView(APIView):
         predicted_rent_max = request.GET.get("predicted_rent_max", 1e20)
         page_size = request.GET.get("page_size", 100000)
         page_number = request.GET.get("page", 1)
+        sort_by = request.GET.get("sort_by", "created_at")
+        sort_order = request.GET.get("sort_order", "desc")
+
+        if sort_by not in ["created_at", "price", "predicted_rent"]:
+            return Response(
+                {
+                    "error": "Invalid sort_by parameter. (created_at, price, predicted_rent)"
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if sort_order not in ["asc", "desc"]:
+            return Response(
+                {"error": "Invalid sort_order parameter. (asc, desc)"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         garden_offers = GardenOffers.objects.filter(
             price__gte=price_min,
@@ -165,6 +194,11 @@ class GardenOfferView(APIView):
             predicted_rent__gte=predicted_rent_min,
             predicted_rent__lte=predicted_rent_max,
         )
+
+        if sort_order == "desc":
+            garden_offers = garden_offers.order_by(f"-{sort_by}")
+        else:
+            garden_offers = garden_offers.order_by(sort_by)
 
         paginator = GardenOfferPagination()
         paginated_garden_offers = paginator.paginate_queryset(garden_offers, request)
