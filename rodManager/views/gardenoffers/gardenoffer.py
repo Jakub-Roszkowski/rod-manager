@@ -175,7 +175,9 @@ class GardenOfferView(APIView):
                 "title": garden_offer.title,
                 "body": garden_offer.body,
                 "contact": {
-                    "name": garden_offer.contact.first_name,
+                    "name": garden_offer.contact.first_name
+                    + " "
+                    + garden_offer.contact.last_name,
                     "phone": garden_offer.contact.phone,
                     "email": garden_offer.contact.email,
                 },
