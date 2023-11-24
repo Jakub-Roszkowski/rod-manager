@@ -181,9 +181,9 @@ class GardenOfferView(APIView):
                 },
                 "garden_info": {
                     "address": str(garden_offer.garden.sector)
-                    + " "
+                    + ","
                     + str(garden_offer.garden.avenue)
-                    + " "
+                    + ","
                     + str(garden_offer.garden.number),
                     "area": garden_offer.garden.area,
                     "price": garden_offer.price,
@@ -235,7 +235,6 @@ class GardenOfferView(APIView):
             price = request.data.get("garden_info").get("price")
             predicted_rent = request.data.get("garden_info").get("predicted_rent")
 
-            # sprawdź czy podane zostały contact_id, garden_id, price, predicted_rent, id muszą istnieć w bazie
             if contact_id and garden_id and price and predicted_rent:
                 contact = Account.objects.filter(id=contact_id)
                 garden = Garden.objects.filter(id=garden_id)
