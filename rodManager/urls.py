@@ -60,7 +60,7 @@ urlpatterns = [
         AnnouncementByIdView.as_view(),
         name="announcementbyid",
     ),
-    path("api/gardenoffers/", GardenOfferView.as_view(), name="gardenoffers"),
+    path("api/garden-offers/", GardenOfferView.as_view(), name="gardenoffers"),
     re_path(
         r"^api/protectedfile/(?P<file_path>.+)$",
         ProtectedFileView.as_view(),
