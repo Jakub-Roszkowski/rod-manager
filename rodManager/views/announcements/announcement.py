@@ -104,7 +104,6 @@ class AnnouncementView(APIView):
         },
     )
     def get(self, request):
-        id = request.GET.get("id")
         tags = request.GET.get("tags", "").split(",")
         page_size = request.GET.get("page_size", 10000)
         page_number = request.GET.get("page", 1)

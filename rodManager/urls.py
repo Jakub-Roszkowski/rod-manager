@@ -27,10 +27,6 @@ schema_view = get_schema_view(
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from .views.addperms import *
-from .views.announcements.announcement import *
-from .views.announcements.announcementbyid import *
-from .views.announcements.events import *
-from .views.announcements.tags import *
 from .views.logout import *
 from .views.protectedfile import *
 from .views.register import *
@@ -48,22 +44,17 @@ urlpatterns = [
     path("api/login/", CustomLogin.as_view(), name="token_obtain_pair"),
     path("api/register/", RegistrationView.as_view(), name="register"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    path("api/announcements/", AnnouncementView.as_view(), name="image"),
     path("api/login/google/", GoogleTokenLogin.as_view(), name="google_login"),
     path("api/logout/", LogoutView.as_view(), name="logout"),
     path("api/addperms/", AddPermsView.as_view(), name="addperms"),
-    path("api/announcements/tag/", TagView.as_view(), name="tag"),
-    path("api/announcements/event/", EventView.as_view(), name="event"),
-    path(
-        "api/announcements/<int:announcement_id>/",
-        AnnouncementByIdView.as_view(),
-        name="announcementbyid",
-    ),
     re_path(
         r"^api/protectedfile/(?P<file_path>.+)$",
         ProtectedFileView.as_view(),
         name="protectedfile",
     ),
+    path("api/garden/", include("rodManager.views.gardens.urls")),
+    path("api/garden-offers/", include("rodManager.views.gardenoffers.urls")),
+    path("api/announcements/", include("rodManager.views.announcements.urls")),
 ]
 
 if settings.DEBUG:
