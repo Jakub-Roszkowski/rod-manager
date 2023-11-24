@@ -8,9 +8,7 @@ import rodManager.views.gardenoffers.gardenoffer as gardenoffers
 import rodManager.views.gardenoffers.getminandmax as getminandmax
 
 urlpatterns = [
-    path(
-        "garden-offers/", gardenoffers.GardenOfferView.as_view(), name="garden-offers"
-    ),
+    path("", gardenoffers.GardenOfferView.as_view(), name="garden-offers"),
     path(
         "min-max/",
         getminandmax.GardenOfferMinMaxVakuesView.as_view(),
