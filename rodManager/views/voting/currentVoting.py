@@ -5,7 +5,8 @@ from rest_framework.views import APIView
 
 from datetime import datetime
 
-from rodManager.views.voting.votingsData import converted_votings as votings
+from rodManager.views.voting.votingsData import votings_data as votings
+
 
 
 class CurrentsVotings(APIView):
@@ -45,27 +46,15 @@ class CurrentsVotings(APIView):
     )
 
     def get(self, request):
-        current_votings = votings
+        # Obecna data
         current_date = datetime.now()
 
-        # Filtrujemy głosowania zakończone po obecnym czasie
-        filtered_votings = [voting for voting in current_votings if voting.finishDate > current_date]
+        # Filtrujemy głosowania z datą zakończenia większą niż obecna data
+        filtered_votings = [voting for voting in votings if
+                            datetime.fromisoformat(voting["finishDate"]) > current_date]
 
         try:
-            response_data = [
-                {
-                    "id": voting.id,
-                    "title": voting.title,
-                    "description": voting.description,
-                    "options": [
-                        {"optionId": option.optionId, "label": option.label}
-                        for option in voting.options
-                    ],
-                    "finishDate": voting.finishDate.isoformat(),  # Konwersja finishDate na format ISO
-                }
-                for voting in filtered_votings
-            ]
-
+            response_data = filtered_votings
             return Response(response_data)
         except Exception as e:
-            return Response({"error": str(e)}, status=400)
+            return Response({"error": "Votings do not exist."}, status=400)

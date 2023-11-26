@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from rodManager.views.voting.votingsData import votings_data as votings
 
 class VoteOnVotingAPIView(APIView):
     @swagger_auto_schema(
@@ -30,8 +31,12 @@ class VoteOnVotingAPIView(APIView):
 
             # TODO: logika i trzeba też zrobić, że jeśli użytkownik już głosował, to może tylko zmienić głos
 
-            # Tutaj możesz umieścić logikę związaną z oddawaniem głosu
-            # np. zapisanie głosu w bazie danych
+            for voting in votings:
+                if voting['id'] == vote_id:
+                    for option in voting['options']:
+                        if option['optionId'] == selected_option_id:
+                            option['votes'] += 1
+
 
             return Response("Vote added successfully", status=status.HTTP_201_CREATED)
         except Exception as e:

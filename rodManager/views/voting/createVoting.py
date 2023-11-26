@@ -4,8 +4,9 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from rodManager.views.voting.votingsData import converted_votings as votings, convert_to_datetime, Option, VotingTopic
+from rodManager.views.voting.votingsData import votings_data as votings
 
+from datetime import datetime
 
 class AddVoting(APIView):
     @swagger_auto_schema(
@@ -34,30 +35,14 @@ class AddVoting(APIView):
         operation_description='Endpoint to create a new voting.',
     )
     def post(self, request):
-        try:
-            new_voting_data = request.data  # Przyjmujemy dane nowego głosowania z żądania
+        # Trzeba tutaj uważać na date bo podaje razem ze strefą czasową
+        iso_date = request.data['finishDate']
 
-            # Tutaj możesz dodać walidację danych nowego głosowania, sprawdzenie poprawności pól itp.
+        date_object = datetime.fromisoformat(iso_date.replace('Z', ''))
 
-            # Tworzymy nową instancję klasy VotingTopic na podstawie danych z żądania
-            new_voting = VotingTopic(
-                _id=new_voting_data.get("id"),
-                title=new_voting_data.get("title"),
-                description=new_voting_data.get("description"),
-                options=[
-                    Option(
-                        option_id=option.get("optionId"),
-                        label=option.get("label"),
-                        votes=option.get("votes", 0)  # Domyślnie 0, można dostosować do własnych potrzeb
-                    )
-                    for option in new_voting_data.get("options", [])
-                ],
-                finish_date=convert_to_datetime(new_voting_data.get("finishDate"))
-            )
+        new_votings = request.data
+        newestvoting = str(date_object)
+        new_votings['finishDate'] = newestvoting
 
-            # Dodaj nowe głosowanie do listy votings_data
-            votings.append(new_voting)
-
-            return Response(new_voting_data, status=status.HTTP_201_CREATED)  # Zwracamy nowe głosowanie
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        votings.append(new_votings)
+        return Response(new_votings, status=status.HTTP_201_CREATED)
