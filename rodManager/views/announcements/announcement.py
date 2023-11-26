@@ -4,9 +4,12 @@ import uuid
 from bs4 import BeautifulSoup
 from django.core.files.base import ContentFile
 from django.db.models import Count, Q
+from drf_spectacular import openapi
+from drf_spectacular.utils import (OpenApiParameter, OpenApiResponse,
+                                   OpenApiTypes, extend_schema)
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -17,78 +20,81 @@ from rodManager.dir_models.tag import Tag
 from rodManager.libs.rodpagitation import RODPagination
 
 
+class EventSerializer(serializers.Serializer):
+    date = serializers.DateTimeField()
+    name = serializers.CharField()
+    
+class AnnouncmentSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    body = serializers.CharField()
+    tags = serializers.ListField(child=serializers.CharField(), required=False)
+    event = EventSerializer()
+    
+
+
 class AnnouncementView(APIView):
-    @swagger_auto_schema(
-        operation_summary="Get a list of announcements",
-        manual_parameters=[
-            openapi.Parameter(
-                "tags",
-                openapi.IN_QUERY,
-                description="Tags to filter by.",
-                type=openapi.TYPE_ARRAY,
-                items=openapi.Items(type=openapi.TYPE_STRING),
-            ),
-            openapi.Parameter(
-                "page_size",
-                openapi.IN_QUERY,
-                description="Number of announcements per page.",
-                type=openapi.TYPE_INTEGER,
-            ),
-            openapi.Parameter(
-                "page",
-                openapi.IN_QUERY,
+    @extend_schema(
+        summary="Get announcements",
+        description="Get all announcements in the system.",
+        parameters=[
+            OpenApiParameter(
+                name="page",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
                 description="Page number.",
-                type=openapi.TYPE_INTEGER,
+            ),
+            OpenApiParameter(
+                name="page_size",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description="Page size.",
+            ),
+            OpenApiParameter(
+                name="tags",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                description="Filter by tags.",
             ),
         ],
         responses={
-            200: openapi.Response(
+            200: OpenApiResponse(
                 description="Announcements retrieved successfully.",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={
-                        "count": openapi.Schema(type=openapi.TYPE_INTEGER),
-                        "results": openapi.Schema(
-                            type=openapi.TYPE_ARRAY,
-                            items=openapi.Items(
-                                type=openapi.TYPE_OBJECT,
-                                properties={
-                                    "id": openapi.Schema(type=openapi.TYPE_INTEGER),
-                                    "title": openapi.Schema(type=openapi.TYPE_STRING),
-                                    "body": openapi.Schema(type=openapi.TYPE_STRING),
-                                    "tags": openapi.Schema(
-                                        type=openapi.TYPE_ARRAY,
-                                        items=openapi.Items(type=openapi.TYPE_STRING),
-                                    ),
-                                    "date": openapi.Schema(
-                                        type=openapi.TYPE_STRING,
-                                        format="date-time",
-                                    ),
-                                    "event": openapi.Schema(
-                                        type=openapi.TYPE_OBJECT,
-                                        properties={
-                                            "date": openapi.Schema(
-                                                type=openapi.TYPE_STRING,
-                                                format="date-time",
-                                            ),
-                                            "name": openapi.Schema(
-                                                type=openapi.TYPE_STRING
-                                            ),
+                response={
+                    "type": "object",
+                    "properties": {
+                        "count": {"type": "integer"},
+                        "results": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {"type": "integer"},
+                                    "title": {"type": "string"},
+                                    "body": {"type": "string"},
+                                    "tags": {
+                                        "type": "array",
+                                        "items": {"type": "string"},
+                                    },
+                                    "date": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                    },
+                                    "event": {
+                                        "type": "object",
+                                        "properties": {
+                                            "date": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                            },
+                                            "name": {"type": "string"},
                                         },
-                                    ),
+                                    },
                                 },
-                            ),
-                        ),
+                            },
+                        },
                     },
-                ),
-            ),
-            400: openapi.Response(
-                description="Bad request.",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={"error": openapi.Schema(type=openapi.TYPE_STRING)},
-                ),
-            ),
+                },
+            )
         },
     )
     def get(self, request):
@@ -126,38 +132,19 @@ class AnnouncementView(APIView):
 
         return paginator.get_paginated_response(serialized_announcements)
 
-    @swagger_auto_schema(
-        operation_summary="Create an announcement",
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                "title": openapi.Schema(type=openapi.TYPE_STRING),
-                "body": openapi.Schema(type=openapi.TYPE_STRING),
-                "tags": openapi.Schema(
-                    type=openapi.TYPE_ARRAY,
-                    items=openapi.Items(type=openapi.TYPE_STRING),
-                ),
-                "event": openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={
-                        "date": openapi.Schema(
-                            type=openapi.TYPE_STRING, format="date-time"
-                        ),
-                        "name": openapi.Schema(type=openapi.TYPE_STRING),
-                    },
-                ),
-            },
-        ),
+    @extend_schema(
+        summary="Create an announcement",
+        request=AnnouncmentSerializer,
         responses={
-            201: openapi.Response(
+            201: OpenApiResponse(
                 description="Announcement created successfully.",
             ),
-            400: openapi.Response(
+            400: OpenApiResponse(
                 description="Bad request.",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={"error": openapi.Schema(type=openapi.TYPE_STRING)},
-                ),
+                response={
+                    "type": "object",
+                    "properties": {"error": {"type": "string"}},
+                },
             ),
         },
     )
