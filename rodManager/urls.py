@@ -58,6 +58,7 @@ urlpatterns = [
     path("api/accounts/", include("rodManager.views.accounts.urls")),
     path("api/votings/", include("rodManager.views.voting.urls")),
     path("api/my-garden/", include("rodManager.views.myGardenPlot.urls")),
+    path("api/garden-info/", include("rodManager.views.gardenInfo.urls")),
     path("api/who-am-i/", WhoamiView.as_view(), name="whoami"),
 ]
 
