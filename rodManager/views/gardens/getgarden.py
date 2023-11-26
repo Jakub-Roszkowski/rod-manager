@@ -21,16 +21,18 @@ from rodManager.libs.rodpagitation import RODPagination
     ],
 response= openapi.Response(
     description="Garden list.",
-    type=openapi.TYPE_ARRAY,
-    items=openapi.Items(type=openapi.TYPE_OBJECT),
+    type=openapi.TYPE_OBJECT,
+    items={
+        "count":openapi.Schema(type=openapi.TYPE_INTEGER),
+        "results":openapi.Items(type=openapi.TYPE_OBJECT),}
 )
 )
 @api_view(['GET'])
 def garden_in_bulk(request):
     paginator = RODPagination()
-    if request.user.is_authenticated:
-        gardens = paginator.paginate_queryset(Garden.objects.all(), request)
-        return Response(serializers.serialize("json", gardens), status=status.HTTP_200_OK)
+    if  request.user.is_authenticated:
+        gardens = paginator.paginate_queryset(Garden.objects.all().order_by("id"), request)
+        return paginator.get_paginated_response(serializers.serialize("json", gardens))
     else:
         return Response({"error": "You don't have permission to view gardens."}, status=status.HTTP_403_FORBIDDEN)
                                   
