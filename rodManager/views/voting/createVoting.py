@@ -1,12 +1,13 @@
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from rodManager.views.voting.votingsData import votings_data as votings
+from rodManager.views.voting.votingsData import converted_votings as votings, convert_to_datetime, Option, VotingTopic
 
 
-class CurrentsVotings(APIView):
+class AddVoting(APIView):
     @swagger_auto_schema(
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -32,15 +33,30 @@ class CurrentsVotings(APIView):
         operation_summary='Create a new voting',
         operation_description='Endpoint to create a new voting.',
     )
-
     def post(self, request):
         try:
             new_voting_data = request.data  # Przyjmujemy dane nowego głosowania z żądania
 
             # Tutaj możesz dodać walidację danych nowego głosowania, sprawdzenie poprawności pól itp.
 
+            # Tworzymy nową instancję klasy VotingTopic na podstawie danych z żądania
+            new_voting = VotingTopic(
+                _id=new_voting_data.get("id"),
+                title=new_voting_data.get("title"),
+                description=new_voting_data.get("description"),
+                options=[
+                    Option(
+                        option_id=option.get("optionId"),
+                        label=option.get("label"),
+                        votes=option.get("votes", 0)  # Domyślnie 0, można dostosować do własnych potrzeb
+                    )
+                    for option in new_voting_data.get("options", [])
+                ],
+                finish_date=convert_to_datetime(new_voting_data.get("finishDate"))
+            )
+
             # Dodaj nowe głosowanie do listy votings_data
-            votings.append(new_voting_data)
+            votings.append(new_voting)
 
             return Response(new_voting_data, status=status.HTTP_201_CREATED)  # Zwracamy nowe głosowanie
         except Exception as e:

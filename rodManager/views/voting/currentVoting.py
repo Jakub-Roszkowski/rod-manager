@@ -3,12 +3,14 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from rodManager.views.voting.votingsData import votings_data as votings
+from datetime import datetime
+
+from rodManager.views.voting.votingsData import converted_votings as votings
 
 
 class CurrentsVotings(APIView):
     @swagger_auto_schema(
-        operation_summary="Get",
+        operation_summary="Get currents votings",
         responses={
             200: openapi.Response(
                 description="Get currents votings",
@@ -41,20 +43,29 @@ class CurrentsVotings(APIView):
             ),
         },
     )
+
     def get(self, request):
-
-        from datetime import datetime
-
-        # Obecna data
+        current_votings = votings
         current_date = datetime.now()
 
-        # Filtrujemy głosowania z datą zakończenia większą niż obecna data
-        filtered_votings = [voting for voting in votings if
-                            datetime.fromisoformat(voting["finishDate"]) > current_date]
-
+        # Filtrujemy głosowania zakończone po obecnym czasie
+        filtered_votings = [voting for voting in current_votings if voting.finishDate > current_date]
 
         try:
-            response_data = filtered_votings
+            response_data = [
+                {
+                    "id": voting.id,
+                    "title": voting.title,
+                    "description": voting.description,
+                    "options": [
+                        {"optionId": option.optionId, "label": option.label}
+                        for option in voting.options
+                    ],
+                    "finishDate": voting.finishDate.isoformat(),  # Konwersja finishDate na format ISO
+                }
+                for voting in filtered_votings
+            ]
+
             return Response(response_data)
-        except Account.DoesNotExist:
-            return Response({"error": "Votings do not exist."}, status=400)
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)
