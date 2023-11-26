@@ -29,6 +29,7 @@ from .views.addperms import *
 from .views.logout import *
 from .views.protectedfile import *
 from .views.register import *
+from .views.whoami import *
 
 urlpatterns = [
     path(
@@ -55,7 +56,7 @@ urlpatterns = [
     path("api/garden-offers/", include("rodManager.views.gardenoffers.urls")),
     path("api/announcements/", include("rodManager.views.announcements.urls")),
     path("api/accounts/", include("rodManager.views.accounts.urls")),
-    path("api/whoami/", include("rodManager.views.whoami.urls")),
+    path("api/who-am-i/", WhoamiView.as_view(), name="whoami"),
 ]
 
 if settings.DEBUG:
