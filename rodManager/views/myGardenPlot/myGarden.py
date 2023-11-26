@@ -1,3 +1,5 @@
+from enum import Enum
+
 from rest_framework import status
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -7,6 +9,10 @@ from datetime import datetime
 
 from rodManager.dir_models.garden import Garden
 
+
+class TypeOfFee(Enum):
+    PerMeter = "Za metr"
+    PerGardenPlot = "Za działkę"
 
 class MyGardenAPI(APIView):
     @swagger_auto_schema(
@@ -124,21 +130,21 @@ class MyGardenAPI(APIView):
             ],
             # TODO: change mediaIndividual to real data from Payments
             "leaseFees": [
-                {"name": "PZD", "type": "PerMeter", "value": 0.12, "sum": 200},
-                {"name": "Opłata ogrodowa", "type": "PerMeter", "value": 0.61, "sum": 200},
-                {"name": "Opłata Inwestycyjna", "type": "PerMeter", "value": 0.5, "sum": 200},
+                {"name": "PZD", "type": TypeOfFee.PerMeter.value, "value": 0.12, "sum": 200},
+                {"name": "Opłata ogrodowa", "type": TypeOfFee.PerMeter.value, "value": 0.61, "sum": 200},
+                {"name": "Opłata Inwestycyjna", "type": TypeOfFee.PerMeter.value, "value": 0.5, "sum": 200},
                 {"name": "Razem", "type": None, "value": None, "sum": 600}
             ],
             # TODO: change mediaIndividual to real data from Counters and Payments
             "utilityFees": [
-                {"name": "Prąd", "type": "PerMeter", "value": 0.12, "sum": 200},
-                {"name": "Woda", "type": "PerMeter", "value": 0.61, "sum": 200},
+                {"name": "Prąd", "type": TypeOfFee.PerMeter.value, "value": 0.12, "sum": 200},
+                {"name": "Woda", "type": TypeOfFee.PerMeter.value, "value": 0.61, "sum": 200},
                 {"name": "Razem", "type": None, "value": None, "sum": 400}
             ],
             # TODO: change mediaIndividual to real data from Payments
             "additionalFees": [
-                {"name": "Koszenie trawy", "type": "PerGardenPlot", "value": 70, "sum": 200},
-                {"name": "Grabienie liści", "type": "PerGardenPlot", "value": 40, "sum": 200},
+                {"name": "Koszenie trawy", "type": TypeOfFee.PerGardenPlot.value, "value": 70, "sum": 200},
+                {"name": "Grabienie liści", "type": TypeOfFee.PerGardenPlot.value, "value": 40, "sum": 200},
                 {"name": "Razem", "type": None, "value": None, "sum": 400}
             ],
             # TODO: change mediaIndividual to real data from individual Payments
