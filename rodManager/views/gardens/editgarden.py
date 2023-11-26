@@ -44,7 +44,7 @@ from drf_yasg import openapi
 )
 @api_view(["PUT"])
 def edit_garden( request):
-    if "rodManager.manageGardens" not in request.user.get_all_permissions():
+    if not request.user.is_authenticated:
         return Response({"error": "You don't have permission to edit gardens."}, status=status.HTTP_403_FORBIDDEN)
     if not request.data["id"]:
             return Response({"error": "Garden ID is required."}, status=status.HTTP_400_BAD_REQUEST)

@@ -37,7 +37,7 @@ from drf_yasg import openapi
 )
 @api_view(['DELETE'])
 def delete_garden( request):
-    if "rodManager.manageGardens" not in request.user.get_all_permissions():
+    if not request.user.is_authenticated:
         return Response({"error": "You don't have permission to delete gardens."}, status=status.HTTP_403_FORBIDDEN)
     if Garden.objects.filter(id=request.data["id"]).exists():
         Garden.objects.get(id=request.data["id"]).delete()

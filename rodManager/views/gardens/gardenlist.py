@@ -32,7 +32,7 @@ from rest_framework import status
     },
 )
 def garden_list(request):
-    if "rodManager.manageGardens" not in request.user.get_all_permissions():
+    if not request.user.is_authenticated:
         return Response({"error": "You don't have permission to view gardens."}, status=status.HTTP_403_FORBIDDEN)
     gardens = Garden.objects.all()
     

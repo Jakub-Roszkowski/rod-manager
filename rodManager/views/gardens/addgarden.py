@@ -38,7 +38,7 @@ from rest_framework import status
 )
 @api_view(['POST'])
 def create_garden(request):
-    if "rodManager.createGarden" in request.user.get_all_permissions():
+    if request.user.is_authenticated:
         if not request.data.get("sector") or not request.data.get("avenue") or not request.data.get("number") or not request.data.get("area") or not request.data.get("status"):
             return Response({"error": "Sector, avenue, number, area and status are required."}, status=status.HTTP_400_BAD_REQUEST)
         

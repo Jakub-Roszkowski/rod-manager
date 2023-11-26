@@ -8,6 +8,8 @@ from django.core import serializers
 from django.core.paginator import Paginator
 from rest_framework.pagination import PageNumberPagination
 
+from rodManager.libs.rodpagitation import RODPagination
+
 
 
 
@@ -25,11 +27,9 @@ response= openapi.Response(
 )
 @api_view(['GET'])
 def garden_in_bulk(request):
-    if "rodManager.manageGardens" not in request.user.get_all_permissions():
-        index = int(request.GET["page"])-1
-        size = int(request.GET["page_size"])
-        paginator = Paginator(Garden.objects.all().order_by('id'), size)
-        gardens = paginator.get_page(index)
+    paginator = RODPagination()
+    if request.user.is_authenticated:
+        gardens = paginator.paginate_queryset(Garden.objects.all(), request)
         return Response(serializers.serialize("json", gardens), status=status.HTTP_200_OK)
     else:
         return Response({"error": "You don't have permission to view gardens."}, status=status.HTTP_403_FORBIDDEN)
