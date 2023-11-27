@@ -1,6 +1,10 @@
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
-from rest_framework import status
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiResponse,
+    OpenApiTypes,
+    extend_schema,
+)
+from rest_framework import serializers, status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -9,30 +13,27 @@ from rodManager.dir_models.tag import Tag
 from rodManager.users.validate import permission_required
 
 
-class TagView(APIView):
-    permission_classes = (AllowAny,)
+class TagSerializer(serializers.Serializer):
+    name = serializers.CharField()
 
-    @swagger_auto_schema(
+
+class TagView(APIView):
+    @extend_schema(
+        summary="Get tags",
+        description="Get all tags in the system.",
         responses={
-            201: openapi.Response(
-                description="List of tags.",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_ARRAY,
-                    items=openapi.Items(
-                        type=openapi.TYPE_OBJECT,
-                        properties={
-                            "name": openapi.Schema(type=openapi.TYPE_STRING),
-                            "times_used": openapi.Schema(type=openapi.TYPE_INTEGER),
+            200: OpenApiResponse(
+                description="Tags retrieved successfully.",
+                response={
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {"type": "string"},
+                            "times_used": {"type": "integer"},
                         },
-                    ),
-                ),
-            ),
-            400: openapi.Response(
-                description="Bad request.",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={"error": openapi.Schema(type=openapi.TYPE_STRING)},
-                ),
+                    },
+                },
             ),
         },
     )
@@ -43,24 +44,16 @@ class TagView(APIView):
             [{"name": tag.name, "times_used": tag.times_used} for tag in tags]
         )
 
-    @swagger_auto_schema(
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                "name": openapi.Schema(type=openapi.TYPE_STRING),
-            },
-            required=["name"],
-        ),
+    @extend_schema(
+        summary="Add tag",
+        description="Add tag to the system.",
+        request=TagSerializer,
         responses={
-            201: openapi.Response(
-                description="Tag created successfully.",
+            201: OpenApiResponse(
+                description="Tag added successfully.",
             ),
-            400: openapi.Response(
-                description="Bad request.",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={"error": openapi.Schema(type=openapi.TYPE_STRING)},
-                ),
+            400: OpenApiResponse(
+                description="Tag already exists.",
             ),
         },
     )

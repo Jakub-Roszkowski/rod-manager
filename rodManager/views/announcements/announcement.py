@@ -5,8 +5,12 @@ from bs4 import BeautifulSoup
 from django.core.files.base import ContentFile
 from django.db.models import Count, Q
 from drf_spectacular import openapi
-from drf_spectacular.utils import (OpenApiParameter, OpenApiResponse,
-                                   OpenApiTypes, extend_schema)
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiResponse,
+    OpenApiTypes,
+    extend_schema,
+)
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import serializers, status
@@ -18,18 +22,19 @@ from rodManager.dir_models.event import Event
 from rodManager.dir_models.image import Image
 from rodManager.dir_models.tag import Tag
 from rodManager.libs.rodpagitation import RODPagination
+from rodManager.users.validate import permission_required
 
 
 class EventSerializer(serializers.Serializer):
     date = serializers.DateTimeField()
     name = serializers.CharField()
-    
+
+
 class AnnouncmentSerializer(serializers.Serializer):
     title = serializers.CharField()
     body = serializers.CharField()
     tags = serializers.ListField(child=serializers.CharField(), required=False)
     event = EventSerializer()
-    
 
 
 class AnnouncementView(APIView):
@@ -138,6 +143,10 @@ class AnnouncementView(APIView):
         responses={
             201: OpenApiResponse(
                 description="Announcement created successfully.",
+                response={
+                    "type": "object",
+                    "properties": {"success": {"type": "string"}},
+                },
             ),
             400: OpenApiResponse(
                 description="Bad request.",
@@ -148,7 +157,7 @@ class AnnouncementView(APIView):
             ),
         },
     )
-    # @permission_required("rodManager.add_announcement")
+    @permission_required("rodManager.add_announcement")
     def post(self, request):
         if request.data.get("title"):
             title = request.data["title"]

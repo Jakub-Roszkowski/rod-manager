@@ -1,5 +1,9 @@
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiResponse,
+    OpenApiTypes,
+    extend_schema,
+)
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,29 +12,32 @@ from rodManager.dir_models.garden import Garden
 
 
 class AvailableGardensView(APIView):
-    @swagger_auto_schema(
+    @extend_schema(
+        summary="Get available gardens",
+        description="Get all available gardens in the system.",
         responses={
-            200: openapi.Response(
-                description="List of available gardens",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_ARRAY,
-                    items=openapi.Schema(
-                        type=openapi.TYPE_OBJECT,
-                        properties={
-                            "id": openapi.Schema(type=openapi.TYPE_STRING),
-                            "sector": openapi.Schema(type=openapi.TYPE_STRING),
-                            "avenue": openapi.Schema(type=openapi.TYPE_STRING),
-                            "number": openapi.Schema(type=openapi.TYPE_INTEGER),
-                            "area": openapi.Schema(type=openapi.TYPE_NUMBER),
-                            "status": openapi.Schema(type=openapi.TYPE_STRING),
+            200: OpenApiResponse(
+                description="Gardens retrieved successfully.",
+                response={
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {"type": "integer"},
+                            "sector": {"type": "string"},
+                            "avenue": {"type": "string"},
+                            "number": {"type": "integer"},
+                            "area": {"type": "number"},
+                            "status": {"type": "string"},
                         },
-                    ),
-                ),
+                    },
+                },
             ),
-        }
+        },
     )
     def get(self, request):
         gardens = Garden.objects.filter(status="dostepna")
+
         return Response(
             [
                 {

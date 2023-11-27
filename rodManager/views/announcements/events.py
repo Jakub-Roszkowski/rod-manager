@@ -1,5 +1,9 @@
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiResponse,
+    OpenApiTypes,
+    extend_schema,
+)
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -7,43 +11,38 @@ from rodManager.dir_models.event import Event
 
 
 class EventView(APIView):
-    @swagger_auto_schema(
-        operation_summary="Get list of events",
-        manual_parameters=[
-            openapi.Parameter(
-                "year",
-                openapi.IN_QUERY,
-                description="Year of event",
-                type=openapi.TYPE_INTEGER,
+    @extend_schema(
+        summary="Get events",
+        description="Get all events in the system.",
+        parameters=[
+            OpenApiParameter(
+                name="year",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description="Filter by year.",
             ),
-            openapi.Parameter(
-                "month",
-                openapi.IN_QUERY,
-                description="Month of event",
-                type=openapi.TYPE_INTEGER,
+            OpenApiParameter(
+                name="month",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description="Filter by month.",
             ),
         ],
         responses={
-            200: openapi.Response(
-                description="List of events",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={
-                        "id": openapi.Schema(type=openapi.TYPE_INTEGER),
-                        "name": openapi.Schema(type=openapi.TYPE_STRING),
-                        "date": openapi.Schema(type=openapi.TYPE_STRING),
-                        "related_announcement": openapi.Schema(
-                            type=openapi.TYPE_INTEGER
-                        ),
+            200: OpenApiResponse(
+                description="Events retrieved successfully.",
+                response={
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {"type": "integer"},
+                            "name": {"type": "string"},
+                            "date": {"type": "string", "format": "date"},
+                            "related_announcement": {"type": "integer"},
+                        },
                     },
-                ),
-            ),
-            400: openapi.Response(
-                description="Bad request.",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={"error": openapi.Schema(type=openapi.TYPE_STRING)},
-                ),
+                },
             ),
         },
     )

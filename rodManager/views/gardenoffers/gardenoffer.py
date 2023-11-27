@@ -3,9 +3,13 @@ import uuid
 
 from bs4 import BeautifulSoup
 from django.core.files.base import ContentFile
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
-from rest_framework import status
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiResponse,
+    OpenApiTypes,
+    extend_schema,
+)
+from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -16,135 +20,135 @@ from rodManager.dir_models.image import Image
 from rodManager.libs.rodpagitation import RODPagination
 
 
+class GardenInfoSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    price = serializers.IntegerField()
+    predicted_rent = serializers.IntegerField()
+
+
+class GardenOfferSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    body = serializers.CharField()
+    contact_id = serializers.IntegerField()
+    garden_info = GardenInfoSerializer()
+
+
 class GardenOfferView(APIView):
-    @swagger_auto_schema(
-        operation_summary="Get a list of garden offers",
-        manual_parameters=[
-            openapi.Parameter(
-                "sort_by",
-                openapi.IN_QUERY,
+    @extend_schema(
+        summary="Get a list of garden offers",
+        description="Get a list of garden offers in the system.",
+        parameters=[
+            OpenApiParameter(
+                name="sort_by",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
                 description="Sort by.",
-                type=openapi.TYPE_STRING,
                 enum=["created_at", "area", "price", "predicted_rent"],
             ),
-            openapi.Parameter(
-                "sort_order",
-                openapi.IN_QUERY,
+            OpenApiParameter(
+                name="sort_order",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
                 description="Sort order.",
-                type=openapi.TYPE_STRING,
                 enum=["asc", "desc"],
             ),
-            openapi.Parameter(
-                "price_min",
-                openapi.IN_QUERY,
+            OpenApiParameter(
+                name="price_min",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
                 description="Minimum price.",
-                type=openapi.TYPE_INTEGER,
             ),
-            openapi.Parameter(
-                "price_max",
-                openapi.IN_QUERY,
+            OpenApiParameter(
+                name="price_max",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
                 description="Maximum price.",
-                type=openapi.TYPE_INTEGER,
             ),
-            openapi.Parameter(
-                "area_min",
-                openapi.IN_QUERY,
+            OpenApiParameter(
+                name="area_min",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
                 description="Minimum area.",
-                type=openapi.TYPE_INTEGER,
             ),
-            openapi.Parameter(
-                "area_max",
-                openapi.IN_QUERY,
+            OpenApiParameter(
+                name="area_max",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
                 description="Maximum area.",
-                type=openapi.TYPE_INTEGER,
             ),
-            openapi.Parameter(
-                "predicted_rent_min",
-                openapi.IN_QUERY,
+            OpenApiParameter(
+                name="predicted_rent_min",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
                 description="Minimum predicted rent.",
-                type=openapi.TYPE_INTEGER,
             ),
-            openapi.Parameter(
-                "predicted_rent_max",
-                openapi.IN_QUERY,
+            OpenApiParameter(
+                name="predicted_rent_max",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
                 description="Maximum predicted rent.",
-                type=openapi.TYPE_INTEGER,
             ),
-            openapi.Parameter(
-                "page_size",
-                openapi.IN_QUERY,
+            OpenApiParameter(
+                name="page_size",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
                 description="Number of offers per page.",
-                type=openapi.TYPE_INTEGER,
             ),
-            openapi.Parameter(
-                "page",
-                openapi.IN_QUERY,
+            OpenApiParameter(
+                name="page",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
                 description="Page number.",
-                type=openapi.TYPE_INTEGER,
             ),
         ],
         responses={
-            200: openapi.Response(
+            200: OpenApiResponse(
                 description="Offer retrieved successfully.",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={
-                        "count": openapi.Schema(type=openapi.TYPE_INTEGER),
-                        "results": openapi.Schema(
-                            type=openapi.TYPE_ARRAY,
-                            items=openapi.Items(
-                                type=openapi.TYPE_OBJECT,
-                                properties={
-                                    "id": openapi.Schema(type=openapi.TYPE_INTEGER),
-                                    "title": openapi.Schema(type=openapi.TYPE_STRING),
-                                    "body": openapi.Schema(type=openapi.TYPE_STRING),
-                                    "contact": openapi.Schema(
-                                        type=openapi.TYPE_OBJECT,
-                                        properties={
-                                            "name": openapi.Schema(
-                                                type=openapi.TYPE_STRING
-                                            ),
-                                            "phone": openapi.Schema(
-                                                type=openapi.TYPE_STRING
-                                            ),
-                                            "email": openapi.Schema(
-                                                type=openapi.TYPE_STRING
-                                            ),
+                response={
+                    "type": "object",
+                    "properties": {
+                        "count": {"type": "integer"},
+                        "results": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {"type": "integer"},
+                                    "title": {"type": "string"},
+                                    "body": {"type": "string"},
+                                    "contact": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {"type": "string"},
+                                            "phone": {"type": "string"},
+                                            "email": {"type": "string"},
                                         },
-                                    ),
-                                    "garden_info": openapi.Schema(
-                                        type=openapi.TYPE_OBJECT,
-                                        properties={
-                                            "address": openapi.Schema(
-                                                type=openapi.TYPE_STRING
-                                            ),
-                                            "area": openapi.Schema(
-                                                type=openapi.TYPE_INTEGER
-                                            ),
-                                            "price": openapi.Schema(
-                                                type=openapi.TYPE_NUMBER
-                                            ),
-                                            "predicted_rent": openapi.Schema(
-                                                type=openapi.TYPE_NUMBER
-                                            ),
+                                    },
+                                    "garden_info": {
+                                        "type": "object",
+                                        "properties": {
+                                            "address": {"type": "string"},
+                                            "area": {"type": "integer"},
+                                            "price": {"type": "number"},
+                                            "predicted_rent": {"type": "number"},
                                         },
-                                    ),
-                                    "created_at": openapi.Schema(
-                                        type=openapi.TYPE_STRING,
-                                        format="date-time",
-                                    ),
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                    },
                                 },
-                            ),
-                        ),
+                            },
+                        },
                     },
-                ),
+                },
             ),
-            400: openapi.Response(
+            400: OpenApiResponse(
                 description="Bad request.",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={"error": openapi.Schema(type=openapi.TYPE_STRING)},
-                ),
+                response={
+                    "type": "object",
+                    "properties": {"error": {"type": "string"}},
+                },
             ),
         },
     )
@@ -219,34 +223,24 @@ class GardenOfferView(APIView):
 
         return paginator.get_paginated_response(serialized_garden_offers)
 
-    @swagger_auto_schema(
-        operation_summary="Create an announcement",
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                "title": openapi.Schema(type=openapi.TYPE_STRING),
-                "body": openapi.Schema(type=openapi.TYPE_STRING),
-                "contact_id": openapi.Schema(type=openapi.TYPE_INTEGER),
-                "garden_info": openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={
-                        "id": openapi.Schema(type=openapi.TYPE_INTEGER),
-                        "price": openapi.Schema(type=openapi.TYPE_NUMBER),
-                        "predicted_rent": openapi.Schema(type=openapi.TYPE_NUMBER),
-                    },
-                ),
-            },
-        ),
+    @extend_schema(
+        summary="Create an announcement",
+        description="Create an announcement",
+        request=GardenOfferSerializer,
         responses={
-            201: openapi.Response(
+            201: OpenApiResponse(
                 description="Announcement created successfully.",
+                response={
+                    "type": "object",
+                    "properties": {"success": {"type": "string"}},
+                },
             ),
-            400: openapi.Response(
+            400: OpenApiResponse(
                 description="Bad request.",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={"error": openapi.Schema(type=openapi.TYPE_STRING)},
-                ),
+                response={
+                    "type": "object",
+                    "properties": {"error": {"type": "string"}},
+                },
             ),
         },
     )

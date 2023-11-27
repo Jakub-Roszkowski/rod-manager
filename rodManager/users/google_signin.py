@@ -1,30 +1,51 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from drf_spectacular.utils import extend_schema
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from google.auth.transport import requests
 from google.oauth2 import id_token
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
+class GoogleTokenSerializer(serializers.Serializer):
+    token = serializers.CharField()
+
+
 class GoogleTokenLogin(APIView):
     permission_classes = (AllowAny,)
 
-    @swagger_auto_schema(
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                "token": openapi.Schema(type=openapi.TYPE_STRING),
-            },
-            required=["token"],
-        ),
+    @extend_schema(
+        summary="Login with Google",
+        description="Login with Google.",
+        request=GoogleTokenSerializer,
         responses={
-            status.HTTP_200_OK: openapi.Response("Login successful"),
-            status.HTTP_400_BAD_REQUEST: openapi.Response("Bad Request"),
+            200: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    "access": openapi.Schema(
+                        type=openapi.TYPE_STRING,
+                        description="Access token.",
+                    ),
+                    "refresh": openapi.Schema(
+                        type=openapi.TYPE_STRING,
+                        description="Refresh token.",
+                    ),
+                },
+            ),
+            400: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    "error": openapi.Schema(
+                        type=openapi.TYPE_STRING,
+                        description="Error message.",
+                    ),
+                },
+            ),
         },
     )
     def post(self, request):

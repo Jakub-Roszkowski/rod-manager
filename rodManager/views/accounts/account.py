@@ -1,10 +1,14 @@
-
-from drf_spectacular.utils import (OpenApiParameter, OpenApiResponse,
-                                   OpenApiTypes, extend_schema)
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiResponse,
+    OpenApiTypes,
+    extend_schema,
+)
 from rest_framework.views import APIView
 
 from rodManager.dir_models.account import Account
 from rodManager.libs.rodpagitation import RODPagination
+from rodManager.users.validate import permission_required
 
 
 class AccountView(APIView):
@@ -16,13 +20,13 @@ class AccountView(APIView):
                 name="page",
                 type=OpenApiTypes.INT,
                 location=OpenApiParameter.QUERY,
-                description="Page number."
+                description="Page number.",
             ),
             OpenApiParameter(
                 name="page_size",
                 type=OpenApiTypes.INT,
                 location=OpenApiParameter.QUERY,
-                description="Page size."
+                description="Page size.",
             ),
         ],
         responses={
@@ -31,7 +35,7 @@ class AccountView(APIView):
                 response={
                     "type": "object",
                     "properties": {
-                        "count": {"type":"integer"},
+                        "count": {"type": "integer"},
                         "results": {
                             "type": "array",
                             "items": {
@@ -50,12 +54,11 @@ class AccountView(APIView):
                             },
                         },
                     },
-                }
+                },
             )
         },
     )
-        
-        
+    @permission_required("rodManager.view_account")
     def get(self, request):
         accounts = Account.objects.all()
 

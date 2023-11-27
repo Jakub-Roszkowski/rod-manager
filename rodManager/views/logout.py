@@ -1,6 +1,5 @@
 from django.contrib.auth import logout
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -10,10 +9,12 @@ from rest_framework.views import APIView
 class LogoutView(APIView):
     permission_classes = (IsAuthenticated,)
 
-    @swagger_auto_schema(
-        request_body=None,
+    @extend_schema(
+        summary="Logout",
+        description="Logout the currently logged in user.",
         responses={
-            status.HTTP_200_OK: openapi.Response("Logout successful"),
+            200: OpenApiResponse(description="Logout successful"),
+            400: OpenApiResponse(description="Bad Request"),
         },
     )
     def post(self, request):

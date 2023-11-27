@@ -1,12 +1,17 @@
 from django.contrib.auth.models import Group
-from drf_spectacular.utils import (OpenApiParameter, OpenApiResponse,
-                                   OpenApiTypes, extend_schema,
-                                   inline_serializer)
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiResponse,
+    OpenApiTypes,
+    extend_schema,
+    inline_serializer,
+)
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from rodManager.dir_models.account import Account
+from rodManager.users.validate import permission_required
 
 
 class UpdateAccountSerializer(serializers.Serializer):
@@ -15,13 +20,13 @@ class UpdateAccountSerializer(serializers.Serializer):
     email = serializers.EmailField()
     phone = serializers.CharField(allow_null=True, required=False)
     groups = serializers.ListField(child=serializers.CharField(), required=False)
-    
+
     def update(self, instance, validated_data):
-        instance.first_name = validated_data.get('first_name', instance.first_name)
-        instance.last_name = validated_data.get('last_name', instance.last_name)
-        instance.email = validated_data.get('email', instance.email)
-        instance.phone = validated_data.get('phone', instance.phone)
-        group_names = validated_data.get('groups')
+        instance.first_name = validated_data.get("first_name", instance.first_name)
+        instance.last_name = validated_data.get("last_name", instance.last_name)
+        instance.email = validated_data.get("email", instance.email)
+        instance.phone = validated_data.get("phone", instance.phone)
+        group_names = validated_data.get("groups")
         if group_names is not None:
             groups = Group.objects.filter(name__in=group_names)
             if len(groups) != len(group_names):
@@ -61,6 +66,7 @@ class AccountByIdView(APIView):
             ),
         },
     )
+    @permission_required("rodManager.view_account")
     def get(self, request, account_id):
         try:
             account = Account.objects.get(id=account_id)
@@ -79,6 +85,7 @@ class AccountByIdView(APIView):
 
     @extend_schema(
         request=UpdateAccountSerializer,
+        summary="Update account",
         responses={
             200: OpenApiResponse(
                 description="Account updated successfully.",
@@ -105,12 +112,25 @@ class AccountByIdView(APIView):
                 },
             ),
         },
-)
+    )
+    @permission_required("rodManager.change_account")
     def put(self, request, account_id):
         try:
             account = Account.objects.get(id=account_id)
-
-            serializer = UpdateAccountSerializer(instance=account, data=request.data, partial=True)
+            if (
+                request.user.groups.filter(name="MANAGER").exists()
+                and not request.user.groups.filter(name="ADMIN").exists()
+            ):
+                if (
+                    account.groups.filter(name="MANAGER").exists()
+                    or account.groups.filter(name="ADMIN").exists()
+                ):
+                    return Response(
+                        {"error": "You cannot change managers or admins."}, status=400
+                    )
+            serializer = UpdateAccountSerializer(
+                instance=account, data=request.data, partial=True
+            )
             serializer.is_valid(raise_exception=True)
             serializer.save()
 
