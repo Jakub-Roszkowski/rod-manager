@@ -116,6 +116,7 @@ class AnnouncementView(APIView):
         announcements = announcements.order_by("-num_tags", "-date")
 
         paginator = RODPagination()
+        paginator = RODPagination()
         paginated_announcements = paginator.paginate_queryset(announcements, request)
 
         serialized_announcements = [

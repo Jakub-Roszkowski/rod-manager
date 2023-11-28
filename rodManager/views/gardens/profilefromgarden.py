@@ -24,7 +24,7 @@ from rodManager.dir_models.garden import Garden
 )
 @api_view(["GET"])
 def profile_from_garden(request):
-    if "rodManager.manageGardens" in request.user.get_all_permissions():
+    if  request.user.is_authenticated:
         if Garden.objects.filter(id=request.data["id"]).exists():
             garden = Garden.objects.get(id=request.data["id"])
             return Response(garden)
