@@ -1,7 +1,8 @@
-from dir_models.payment import Payment
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from rodManager.dir_models.payment import Payment
 
 
 class ListPaymentsView(APIView):
