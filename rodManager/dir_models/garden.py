@@ -7,7 +7,7 @@ class PlotStatus(models.TextChoices):
 
 
 class Garden(models.Model):
-    id = models.CharField(max_length=255, primary_key=True)
+    id = models.AutoField(primary_key=True)
     sector = models.CharField(max_length=255, null=True, blank=True)
     avenue = models.CharField(max_length=255, null=True, blank=True)
     number = models.IntegerField()
