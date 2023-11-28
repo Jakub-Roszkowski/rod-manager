@@ -8,6 +8,8 @@ def permission_required(permissionsList=None):
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
+            print(request.request.user)
+            print(permissionsList)
             if request.request.user.is_authenticated:
                 if request.request.user.is_superuser:
                     return view_func(request, *args, **kwargs)

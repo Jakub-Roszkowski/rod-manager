@@ -1,10 +1,13 @@
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
-from rest_framework import status
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
 from rodManager.dir_models.garden import Garden, PlotStatus
+from django.core import serializers
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from rest_framework import status
+
+
 
 
 @swagger_auto_schema(
@@ -33,36 +36,22 @@ from rodManager.dir_models.garden import Garden, PlotStatus
         ),
     },
 )
-@api_view(["POST"])
+@api_view(['POST'])
 def create_garden(request):
-    if "rodManager.createGarden" in request.user.get_all_permissions():
-        if (
-            not request.data.get("sector")
-            or not request.data.get("avenue")
-            or not request.data.get("number")
-            or not request.data.get("area")
-            or not request.data.get("status")
-        ):
-            return Response(
-                {"error": "Sector, avenue, number, area and status are required."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
+    if request.user.is_authenticated:
+        if not request.data.get("sector") or not request.data.get("avenue") or not request.data.get("number") or not request.data.get("area") or not request.data.get("status"):
+            return Response({"error": "Sector, avenue, number, area and status are required."}, status=status.HTTP_400_BAD_REQUEST)
+        
         if request.data["status"] not in [PlotStatus.AVAILABLE, PlotStatus.UNAVAILABLE]:
-            return Response(
-                {"error": "Status must be dostępna or niedostępna."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
+            return Response({"error": "Status must be dostępna or niedostępna."}, status=status.HTTP_400_BAD_REQUEST)
+        
         if Garden.objects.filter(
             sector=request.data["sector"],
             avenue=request.data["avenue"],
             number=request.data["number"],
         ).exists():
-            return Response(
-                {"error": "Garden already exists."}, status=status.HTTP_400_BAD_REQUEST
-            )
-
+            return Response({"error": "Garden already exists."}, status=status.HTTP_400_BAD_REQUEST)
+        
         newgarden = Garden.objects.create(
             sector=request.data["sector"],
             avenue=request.data["avenue"],
@@ -71,11 +60,7 @@ def create_garden(request):
             status=request.data["status"],
         )
         newgarden.save()
-        return Response(
-            {"success": "Garden created successfully."}, status=status.HTTP_201_CREATED
-        )
-    else:
-        return Response(
-            {"error": "You don't have permission to create gardens."},
-            status=status.HTTP_403_FORBIDDEN,
-        )
+        return Response({"success": "Garden created successfully."}, status=status.HTTP_201_CREATED)
+    else :
+        return Response({"error": "You don't have permission to create gardens."}, status=status.HTTP_403_FORBIDDEN)
+        

@@ -1,42 +1,72 @@
 from django.contrib.auth.models import Group
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiResponse,
+    OpenApiTypes,
+    extend_schema,
+    inline_serializer,
+)
+from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from rodManager.dir_models.account import Account
+from rodManager.users.validate import permission_required
+
+
+class UpdateAccountSerializer(serializers.Serializer):
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    email = serializers.EmailField()
+    phone = serializers.CharField(allow_null=True, required=False)
+    groups = serializers.ListField(child=serializers.CharField(), required=False)
+
+    def update(self, instance, validated_data):
+        instance.first_name = validated_data.get("first_name", instance.first_name)
+        instance.last_name = validated_data.get("last_name", instance.last_name)
+        instance.email = validated_data.get("email", instance.email)
+        instance.phone = validated_data.get("phone", instance.phone)
+        group_names = validated_data.get("groups")
+        if group_names is not None:
+            groups = Group.objects.filter(name__in=group_names)
+            if len(groups) != len(group_names):
+                raise serializers.ValidationError("One or more groups do not exist.")
+            instance.groups.set(groups)
+        instance.save()
+        return instance
 
 
 class AccountByIdView(APIView):
-    @swagger_auto_schema(
-        operation_summary="Get account by id",
+    @extend_schema(
+        summary="Get account by id",
         responses={
-            200: openapi.Response(
+            200: OpenApiResponse(
                 description="Accounts",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={
-                        "id": openapi.Schema(type=openapi.TYPE_INTEGER),
-                        "first_name": openapi.Schema(type=openapi.TYPE_STRING),
-                        "last_name": openapi.Schema(type=openapi.TYPE_STRING),
-                        "email": openapi.Schema(type=openapi.TYPE_STRING),
-                        "phone": openapi.Schema(type=openapi.TYPE_STRING),
-                        "groups": openapi.Schema(
-                            type=openapi.TYPE_ARRAY,
-                            items=openapi.Items(type=openapi.TYPE_STRING),
-                        ),
+                response={
+                    "type": "object",
+                    "properties": {
+                        "id": {"type": "integer"},
+                        "first_name": {"type": "string"},
+                        "last_name": {"type": "string"},
+                        "email": {"type": "string"},
+                        "phone": {"type": "string"},
+                        "groups": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                        },
                     },
-                ),
+                },
             ),
-            400: openapi.Response(
+            400: OpenApiResponse(
                 description="Bad request.",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={"error": openapi.Schema(type=openapi.TYPE_STRING)},
-                ),
+                response={
+                    "type": "object",
+                    "properties": {"error": {"type": "string"}},
+                },
             ),
         },
     )
+    @permission_required("rodManager.view_account")
     def get(self, request, account_id):
         try:
             account = Account.objects.get(id=account_id)
@@ -53,64 +83,59 @@ class AccountByIdView(APIView):
         except Account.DoesNotExist:
             return Response({"error": "Account does not exist."}, status=400)
 
-    @swagger_auto_schema(
-        operation_summary="Update account",
+    @extend_schema(
+        request=UpdateAccountSerializer,
+        summary="Update account",
         responses={
-            200: openapi.Response(
+            200: OpenApiResponse(
                 description="Account updated successfully.",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={
-                        "id": openapi.Schema(type=openapi.TYPE_INTEGER),
-                        "first_name": openapi.Schema(type=openapi.TYPE_STRING),
-                        "last_name": openapi.Schema(type=openapi.TYPE_STRING),
-                        "email": openapi.Schema(type=openapi.TYPE_STRING),
-                        "phone": openapi.Schema(type=openapi.TYPE_STRING),
-                        "groups": openapi.Schema(
-                            type=openapi.TYPE_ARRAY,
-                            items=openapi.Items(type=openapi.TYPE_STRING),
-                        ),
+                response={
+                    "type": "object",
+                    "properties": {
+                        "id": {"type": "integer"},
+                        "first_name": {"type": "string"},
+                        "last_name": {"type": "string"},
+                        "email": {"type": "string"},
+                        "phone": {"type": "string"},
+                        "groups": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                        },
                     },
-                ),
+                },
             ),
-            400: openapi.Response(
+            400: OpenApiResponse(
                 description="Bad request.",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={"error": openapi.Schema(type=openapi.TYPE_STRING)},
-                ),
+                response={
+                    "type": "object",
+                    "properties": {"error": {"type": "string"}},
+                },
             ),
         },
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                "first_name": openapi.Schema(type=openapi.TYPE_STRING),
-                "last_name": openapi.Schema(type=openapi.TYPE_STRING),
-                "email": openapi.Schema(type=openapi.TYPE_STRING),
-                "phone": openapi.Schema(type=openapi.TYPE_STRING),
-                "groups": openapi.Schema(
-                    type=openapi.TYPE_ARRAY,
-                    items=openapi.Items(type=openapi.TYPE_STRING),
-                ),
-            },
-        ),
     )
+    @permission_required("rodManager.change_account")
     def put(self, request, account_id):
         try:
             account = Account.objects.get(id=account_id)
-            account.first_name = request.data.get("first_name")
-            account.last_name = request.data.get("last_name")
-            account.email = request.data.get("email")
-            account.phone = request.data.get("phone")
-            group_names = request.data.get("groups")
-            groups = Group.objects.filter(name__in=group_names)
-            if len(groups) != len(group_names):
-                return Response(
-                    {"error": "One or more groups do not exist"}, status=400
-                )
+            if (
+                request.user.groups.filter(name="MANAGER").exists()
+                and not request.user.groups.filter(name="ADMIN").exists()
+            ):
+                if (
+                    account.groups.filter(name="MANAGER").exists()
+                    or account.groups.filter(name="ADMIN").exists()
+                ):
+                    return Response(
+                        {"error": "You cannot change managers or admins."}, status=400
+                    )
+            serializer = UpdateAccountSerializer(
+                instance=account, data=request.data, partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
 
-            account.groups.set(groups)
-            account.save()
+            account.refresh_from_db()
+
             response_data = {
                 "id": account.id,
                 "first_name": account.first_name,

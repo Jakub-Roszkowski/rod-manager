@@ -1,6 +1,10 @@
 from django.db.models import Max, Min
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiResponse,
+    OpenApiTypes,
+    extend_schema,
+)
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -11,23 +15,25 @@ from rodManager.dir_models.gardenoffers import GardenOffers
 
 
 class GardenOfferMinMaxVakuesView(APIView):
-    @swagger_auto_schema(
+    @extend_schema(
+        summary="Get garden offers min and max values",
+        description="Get garden offers min and max values",
         responses={
-            200: openapi.Response(
+            200: OpenApiResponse(
                 description="Garden offers min and max values",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={
-                        "min_price": openapi.Schema(type=openapi.TYPE_NUMBER),
-                        "max_price": openapi.Schema(type=openapi.TYPE_NUMBER),
-                        "min_area": openapi.Schema(type=openapi.TYPE_NUMBER),
-                        "max_area": openapi.Schema(type=openapi.TYPE_NUMBER),
-                        "min_predicted_rent": openapi.Schema(type=openapi.TYPE_NUMBER),
-                        "max_predicted_rent": openapi.Schema(type=openapi.TYPE_NUMBER),
+                response={
+                    "type": "object",
+                    "properties": {
+                        "min_price": {"type": "number"},
+                        "max_price": {"type": "number"},
+                        "min_area": {"type": "number"},
+                        "max_area": {"type": "number"},
+                        "min_predicted_rent": {"type": "number"},
+                        "max_predicted_rent": {"type": "number"},
                     },
-                ),
+                },
             )
-        }
+        },
     )
     def get(self, request):
         min_price = GardenOffers.objects.aggregate(min_price=Min("price"))["min_price"]
