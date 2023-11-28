@@ -1,51 +1,52 @@
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from rodManager.dir_models.announcement import Announcement
 
 
-# add get for getting announcement by id
 class AnnouncementByIdView(APIView):
-    @swagger_auto_schema(
-        operation_summary="Get announcement by id",
+    @extend_schema(
+        summary="Get announcement by id",
+        description="Get announcement by id",
         responses={
-            200: openapi.Response(
-                description="Announcement",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={
-                        "id": openapi.Schema(type=openapi.TYPE_INTEGER),
-                        "title": openapi.Schema(type=openapi.TYPE_STRING),
-                        "body": openapi.Schema(type=openapi.TYPE_STRING),
-                        "tags": openapi.Schema(
-                            type=openapi.TYPE_ARRAY,
-                            items=openapi.Items(type=openapi.TYPE_STRING),
-                        ),
-                        "date": openapi.Schema(
-                            type=openapi.TYPE_STRING,
-                            format="date-time",
-                        ),
-                        "event": openapi.Schema(
-                            type=openapi.TYPE_OBJECT,
-                            properties={
-                                "date": openapi.Schema(
-                                    type=openapi.TYPE_STRING,
-                                    format="date-time",
-                                ),
-                                "name": openapi.Schema(type=openapi.TYPE_STRING),
+            200: OpenApiResponse(
+                description="Announcement retrieved successfully.",
+                response={
+                    "type": "object",
+                    "properties": {
+                        "id": {"type": "integer"},
+                        "title": {"type": "string"},
+                        "body": {"type": "string"},
+                        "tags": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                        },
+                        "date": {
+                            "type": "string",
+                            "format": "date",
+                        },
+                        "event": {
+                            "type": "object",
+                            "properties": {
+                                "date": {
+                                    "type": "string",
+                                    "format": "date",
+                                },
+                                "name": {"type": "string"},
                             },
-                        ),
+                        },
                     },
-                ),
+                },
             ),
-            400: openapi.Response(
-                description="Bad request.",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={"error": openapi.Schema(type=openapi.TYPE_STRING)},
-                ),
+            400: OpenApiResponse(
+                description="Announcement does not exist.",
+                response={
+                    "type": "object",
+                    "properties": {
+                        "error": {"type": "string"},
+                    },
+                },
             ),
         },
     )

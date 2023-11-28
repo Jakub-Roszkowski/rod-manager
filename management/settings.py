@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     "rest_framework_swagger",
     "rest_framework.authtoken",
     "rest_framework_simplejwt",
-    "drf_yasg",
+    "drf_spectacular",
     "rodManager",
 ]
 
@@ -143,8 +143,17 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.AllowAny",),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
+SPECTACULAR_SETTINGS = {
+    "TITLE": "rodManager API",
+    "DESCRIPTION": "Api systemu zarządzania działkami",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SCHEMA_PATH_PREFIX": r"/api/",
+    # OTHER SETTINGS
+}
 
 APPEND_SLASH = False
 

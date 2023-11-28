@@ -1,12 +1,21 @@
 from django.contrib.auth import get_user_model
 from django.core.validators import validate_email
+from drf_spectacular.utils import extend_schema
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+
+
+class RegistrationSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(required=True)
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+    phone = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
 
 class RegistrationView(APIView):
@@ -24,6 +33,30 @@ class RegistrationView(APIView):
             },
             required=["email", "password", "first_name", "last_name"],
         ),
+        responses={
+            201: openapi.Response(
+                description="User created successfully.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "refresh": openapi.Schema(type=openapi.TYPE_STRING),
+                        "access": openapi.Schema(type=openapi.TYPE_STRING),
+                    },
+                ),
+            ),
+            400: openapi.Response(
+                description="Bad request.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={"error": openapi.Schema(type=openapi.TYPE_STRING)},
+                ),
+            ),
+        },
+    )
+    @extend_schema(
+        summary="Register",
+        description="Register a new user.",
+        request=RegistrationSerializer,
         responses={
             201: openapi.Response(
                 description="User created successfully.",
