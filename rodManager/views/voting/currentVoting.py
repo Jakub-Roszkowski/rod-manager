@@ -51,7 +51,7 @@ class CurrentsVotings(APIView):
 
         # Filtrujemy głosowania z datą zakończenia większą niż obecna data
         filtered_votings = [voting for voting in votings if
-                            datetime.fromisoformat(voting["finishDate"]) > current_date]
+                            datetime.strptime(voting["finishDate"], "%Y-%m-%dT%H:%M:%S.%fZ")  > current_date]
 
         try:
             response_data = filtered_votings
