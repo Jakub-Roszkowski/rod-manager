@@ -84,10 +84,67 @@ class AdditionalFeeView(APIView):
         }
     )
     def patch(self, request):
+        paymentID = int(request.data['feeID'])
         try:
-            paymentsData.payments['additionalFees'] = request.data
+            for fee in paymentsData.payments['additionalFees']:
+                if fee['feeID'] == paymentID:
+                    fee['name'] = request.data['name']
+                    fee['type'] = request.data['type']
+                    fee['value'] = request.data['value']
+                    return Response({"message": "AdditionalFee data updated successfully"}, status=status.HTTP_200_OK)
 
             return Response({"message": "AdditionalFeedata updated successfully"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"message": "Error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @extend_schema(
+        summary="Create AdditionalFee",
+        description="Create AdditionalFee",
+        request=FeeSerializer,
+        responses={
+            201: OpenApiResponse(description="AdditionalFee created successfully."),
+            400: OpenApiResponse(description="Bad request."),
+            500: OpenApiResponse(description="Server error occurred."),
+        }
+    )
+    def post(self, request):
+        try:
+            new_fee_data = {
+                "feeID": int(request.data.get('feeID')),
+                "name": request.data.get('name'),
+                "type": request.data.get('type'),
+                "value": int(request.data.get('value'))
+            }
+
+            # Dodaj nową opłatę do listy
+            paymentsData.payments['additionalFees'].append(new_fee_data)
+
+            return Response({"message": "AdditionalFee created successfully"}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({"message": "Error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @extend_schema(
+        summary="Delete AdditionalFee",
+        description="Delete AdditionalFee by ID",
+        parameters=[OpenApiParameter(name='feeID', type=OpenApiTypes.INT, location=OpenApiParameter.QUERY)],
+        responses={
+            204: OpenApiResponse(description="AdditionalFee deleted successfully."),
+            404: OpenApiResponse(description="AdditionalFee not found."),
+            500: OpenApiResponse(description="Server error occurred."),
+        }
+    )
+    def delete(self, request):
+        feeID = int(request.query_params.get('feeID'))
+        try:
+            # Znajdź opłatę dodatkową do usunięcia
+            for index, fee in enumerate(paymentsData.payments['additionalFees']):
+                if fee['feeID'] == feeID:
+                    del paymentsData.payments['additionalFees'][index]
+                    return Response({"message": f"Succes Delate"}, status=status.HTTP_204_NO_CONTENT)
+
+            # Jeśli nie znaleziono opłaty o podanym ID
+            return Response({"message": f"No AdditionalFee with ID {feeID} found"},
+                            status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"message": "Error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
