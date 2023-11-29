@@ -1,0 +1,1247 @@
+openapi: 3.0.3
+info:
+  title: rodManager API
+  version: 1.0.0
+  description: Api systemu zarządzania działkami
+paths:
+  /api/accounts/:
+    get:
+      operationId: accounts_retrieve
+      description: Get all accounts in the system.
+      summary: Get accounts
+      parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+        description: Page number.
+      - in: query
+        name: page_size
+        schema:
+          type: integer
+        description: Page size.
+      tags:
+      - accounts
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        first_name:
+                          type: string
+                        last_name:
+                          type: string
+                        email:
+                          type: string
+                        phone:
+                          type: string
+                        groups:
+                          type: array
+                          items:
+                            type: string
+          description: Accounts retrieved successfully.
+  /api/accounts/{account_id}/:
+    get:
+      operationId: accounts_retrieve_2
+      summary: Get account by id
+      parameters:
+      - in: path
+        name: account_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - accounts
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+                  email:
+                    type: string
+                  phone:
+                    type: string
+                  groups:
+                    type: array
+                    items:
+                      type: string
+          description: Accounts
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: Bad request.
+    put:
+      operationId: accounts_update
+      summary: Update account
+      parameters:
+      - in: path
+        name: account_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAccount'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UpdateAccount'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UpdateAccount'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+                  email:
+                    type: string
+                  phone:
+                    type: string
+                  groups:
+                    type: array
+                    items:
+                      type: string
+          description: Account updated successfully.
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: Bad request.
+  /api/addperms/:
+    post:
+      operationId: addperms_create
+      summary: Add user to group
+      tags:
+      - addperms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddPermsRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AddPermsRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AddPermsRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          description: Group added successfully
+        '400':
+          description: Bad Request
+  /api/announcements/:
+    get:
+      operationId: announcements_retrieve
+      description: Get all announcements in the system.
+      summary: Get announcements
+      parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+        description: Page number.
+      - in: query
+        name: page_size
+        schema:
+          type: integer
+        description: Page size.
+      - in: query
+        name: tags
+        schema:
+          type: string
+        description: Filter by tags.
+      tags:
+      - announcements
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        title:
+                          type: string
+                        body:
+                          type: string
+                        tags:
+                          type: array
+                          items:
+                            type: string
+                        date:
+                          type: string
+                          format: date-time
+                        event:
+                          type: object
+                          properties:
+                            date:
+                              type: string
+                              format: date-time
+                            name:
+                              type: string
+          description: Announcements retrieved successfully.
+    post:
+      operationId: announcements_create
+      summary: Create an announcement
+      tags:
+      - announcements
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Announcment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Announcment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Announcment'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+          description: Announcement created successfully.
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: Bad request.
+  /api/announcements/{announcement_id}/:
+    get:
+      operationId: announcements_retrieve_2
+      description: Get announcement by id
+      summary: Get announcement by id
+      parameters:
+      - in: path
+        name: announcement_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - announcements
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  body:
+                    type: string
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                  date:
+                    type: string
+                    format: date
+                  event:
+                    type: object
+                    properties:
+                      date:
+                        type: string
+                        format: date
+                      name:
+                        type: string
+          description: Announcement retrieved successfully.
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: Announcement does not exist.
+  /api/announcements/event/:
+    get:
+      operationId: announcements_event_retrieve
+      description: Get all events in the system.
+      summary: Get events
+      parameters:
+      - in: query
+        name: month
+        schema:
+          type: integer
+        description: Filter by month.
+      - in: query
+        name: year
+        schema:
+          type: integer
+        description: Filter by year.
+      tags:
+      - announcements
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    date:
+                      type: string
+                      format: date
+                    related_announcement:
+                      type: integer
+          description: Events retrieved successfully.
+  /api/announcements/tag/:
+    get:
+      operationId: announcements_tag_retrieve
+      description: Get all tags in the system.
+      summary: Get tags
+      tags:
+      - announcements
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    times_used:
+                      type: integer
+          description: Tags retrieved successfully.
+    post:
+      operationId: announcements_tag_create
+      description: Add tag to the system.
+      summary: Add tag
+      tags:
+      - announcements
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tag'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Tag'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Tag'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          description: Tag added successfully.
+        '400':
+          description: Tag already exists.
+  /api/garden-info/:
+    get:
+      operationId: garden_info_retrieve
+      tags:
+      - garden-info
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: garden_info_create
+      tags:
+      - garden-info
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/garden-info/{employer_id}/:
+    put:
+      operationId: garden_info_update
+      parameters:
+      - in: path
+        name: employer_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - garden-info
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/garden-offers/:
+    get:
+      operationId: garden_offers_retrieve
+      description: Get a list of garden offers in the system.
+      summary: Get a list of garden offers
+      parameters:
+      - in: query
+        name: area_max
+        schema:
+          type: integer
+        description: Maximum area.
+      - in: query
+        name: area_min
+        schema:
+          type: integer
+        description: Minimum area.
+      - in: query
+        name: page
+        schema:
+          type: integer
+        description: Page number.
+      - in: query
+        name: page_size
+        schema:
+          type: integer
+        description: Number of offers per page.
+      - in: query
+        name: predicted_rent_max
+        schema:
+          type: integer
+        description: Maximum predicted rent.
+      - in: query
+        name: predicted_rent_min
+        schema:
+          type: integer
+        description: Minimum predicted rent.
+      - in: query
+        name: price_max
+        schema:
+          type: integer
+        description: Maximum price.
+      - in: query
+        name: price_min
+        schema:
+          type: integer
+        description: Minimum price.
+      - in: query
+        name: sort_by
+        schema:
+          type: string
+          enum:
+          - area
+          - created_at
+          - predicted_rent
+          - price
+        description: Sort by.
+      - in: query
+        name: sort_order
+        schema:
+          type: string
+          enum:
+          - asc
+          - desc
+        description: Sort order.
+      tags:
+      - garden-offers
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        title:
+                          type: string
+                        body:
+                          type: string
+                        contact:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            phone:
+                              type: string
+                            email:
+                              type: string
+                        garden_info:
+                          type: object
+                          properties:
+                            address:
+                              type: string
+                            area:
+                              type: integer
+                            price:
+                              type: number
+                            predicted_rent:
+                              type: number
+                        created_at:
+                          type: string
+                          format: date-time
+          description: Offer retrieved successfully.
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: Bad request.
+    post:
+      operationId: garden_offers_create
+      description: Create an announcement
+      summary: Create an announcement
+      tags:
+      - garden-offers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GardenOffer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GardenOffer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GardenOffer'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+          description: Announcement created successfully.
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: Bad request.
+  /api/garden-offers/available-gardens/:
+    get:
+      operationId: garden_offers_available_gardens_retrieve
+      description: Get all available gardens in the system.
+      summary: Get available gardens
+      tags:
+      - garden-offers
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    sector:
+                      type: string
+                    avenue:
+                      type: string
+                    number:
+                      type: integer
+                    area:
+                      type: number
+                    status:
+                      type: string
+          description: Gardens retrieved successfully.
+  /api/garden-offers/contact/:
+    get:
+      operationId: garden_offers_contact_retrieve
+      description: Get all managers in the system.
+      summary: Get managers
+      tags:
+      - garden-offers
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    phone:
+                      type: string
+                    email:
+                      type: string
+          description: Managers retrieved successfully.
+  /api/garden-offers/min-max/:
+    get:
+      operationId: garden_offers_min_max_retrieve
+      description: Get garden offers min and max values
+      summary: Get garden offers min and max values
+      tags:
+      - garden-offers
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  min_price:
+                    type: number
+                  max_price:
+                    type: number
+                  min_area:
+                    type: number
+                  max_area:
+                    type: number
+                  min_predicted_rent:
+                    type: number
+                  max_predicted_rent:
+                    type: number
+          description: Garden offers min and max values
+  /api/gardens/:
+    get:
+      operationId: gardens_retrieve
+      tags:
+      - gardens
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: gardens_create
+      tags:
+      - gardens
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: gardens_update
+      tags:
+      - gardens
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: gardens_destroy
+      tags:
+      - gardens
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/gardens/gardenlist/:
+    get:
+      operationId: gardens_gardenlist_retrieve
+      tags:
+      - gardens
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/gardens/id/:
+    get:
+      operationId: gardens_id_retrieve
+      tags:
+      - gardens
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/gardens/profile/:
+    get:
+      operationId: gardens_profile_retrieve
+      tags:
+      - gardens
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/login/:
+    post:
+      operationId: login_create
+      description: Login to the system.
+      summary: Login
+      tags:
+      - login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomLogin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomLogin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomLogin'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  refresh:
+                    type: string
+                  access:
+                    type: string
+                  roles:
+                    type: array
+                    items:
+                      type: string
+          description: Login successful.
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: Bad request.
+  /api/login/google/:
+    post:
+      operationId: login_google_create
+      description: Login with Google.
+      summary: Login with Google
+      tags:
+      - login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoogleToken'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GoogleToken'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GoogleToken'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access:
+                    description: Access token.
+                    type: string
+                  refresh:
+                    description: Refresh token.
+                    type: string
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    description: Error message.
+                    type: string
+          description: ''
+  /api/logout/:
+    post:
+      operationId: logout_create
+      description: Logout the currently logged in user.
+      summary: Logout
+      tags:
+      - logout
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: Logout successful
+        '400':
+          description: Bad Request
+  /api/my-garden/:
+    get:
+      operationId: my_garden_retrieve
+      tags:
+      - my-garden
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/payments/addpayment/:
+    post:
+      operationId: payments_addpayment_create
+      tags:
+      - payments
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/payments/listpayments/:
+    get:
+      operationId: payments_listpayments_retrieve
+      tags:
+      - payments
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/register/:
+    post:
+      operationId: register_create
+      description: Register a new user.
+      summary: Register
+      tags:
+      - register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Registration'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Registration'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Registration'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                description: User created successfully.
+                schema:
+                  type: object
+                  properties:
+                    refresh:
+                      type: string
+                    access:
+                      type: string
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                description: Bad request.
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: string
+          description: ''
+  /api/technical-problem/:
+    post:
+      operationId: technical_problem_create
+      tags:
+      - technical-problem
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/token/refresh/:
+    post:
+      operationId: token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/votings/add/:
+    post:
+      operationId: votings_add_create
+      tags:
+      - votings
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/votings/completed/:
+    get:
+      operationId: votings_completed_retrieve
+      tags:
+      - votings
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/votings/current/:
+    get:
+      operationId: votings_current_retrieve
+      tags:
+      - votings
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/votings/vote/:
+    post:
+      operationId: votings_vote_create
+      tags:
+      - votings
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/who-am-i/:
+    get:
+      operationId: who_am_i_retrieve
+      description: Get information about the currently logged in user.
+      summary: Who am I
+      tags:
+      - who-am-i
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  email:
+                    type: string
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: ''
+components:
+  schemas:
+    AddPermsRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+      required:
+      - email
+      - role
+    Announcment:
+      type: object
+      properties:
+        title:
+          type: string
+        body:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        event:
+          $ref: '#/components/schemas/Event'
+      required:
+      - body
+      - event
+      - title
+    CustomLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+      - email
+      - password
+    Event:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+        name:
+          type: string
+      required:
+      - date
+      - name
+    GardenInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+        price:
+          type: integer
+        predicted_rent:
+          type: integer
+      required:
+      - id
+      - predicted_rent
+      - price
+    GardenOffer:
+      type: object
+      properties:
+        title:
+          type: string
+        body:
+          type: string
+        contact_id:
+          type: integer
+        garden_info:
+          $ref: '#/components/schemas/GardenInfo'
+      required:
+      - body
+      - contact_id
+      - garden_info
+      - title
+    GoogleToken:
+      type: object
+      properties:
+        token:
+          type: string
+      required:
+      - token
+    Registration:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        phone:
+          type: string
+          nullable: true
+      required:
+      - email
+      - first_name
+      - last_name
+      - password
+    Tag:
+      type: object
+      properties:
+        name:
+          type: string
+      required:
+      - name
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          writeOnly: true
+      required:
+      - access
+      - refresh
+    UpdateAccount:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+          nullable: true
+        groups:
+          type: array
+          items:
+            type: string
+      required:
+      - email
+      - first_name
+      - last_name
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
