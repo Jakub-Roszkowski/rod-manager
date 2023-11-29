@@ -6,12 +6,13 @@ from rest_framework.response import Response
 from sympy import im
 from rodManager.dir_models.garden import Garden, GardenSerializer, PlotStatus
 from django.core import serializers
-from drf_spectacular.utils import OpenApiResponse, extend_schema, OpenApiParameter
+from drf_spectacular.utils import OpenApiResponse, extend_schema, OpenApiParameter, inline_serializer
 from drf_spectacular.types import OpenApiTypes
 from rest_framework import status
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rodManager.libs.rodpagitation import RODPagination
+import drf_spectacular.serializers as drfserializers
 
 
 
@@ -19,6 +20,7 @@ from rodManager.libs.rodpagitation import RODPagination
 class GardensCRUD(APIView):  
     queryset = Garden.objects.all()
     serializer_class = GardenSerializer
+    pagination_class = RODPagination
     @extend_schema(
     summary="Get gardens",
     description="Get all gardens.",
@@ -26,12 +28,15 @@ class GardensCRUD(APIView):
         OpenApiParameter(name="page", type=OpenApiTypes.INT),
         OpenApiParameter(name="page_size", type=OpenApiTypes.INT),
     ],
-
-        
+    responses={
+        200: OpenApiResponse(
+            description="Garden list.",
+            response=GardenSerializer(many=True),
+        ),
+    }
     
     )
     def get(self, request):
-        pagination_class = RODPagination()
         paginator = RODPagination()
         if  request.user.is_authenticated:
             gardens = paginator.paginate_queryset(Garden.objects.all().order_by("id"), request)
