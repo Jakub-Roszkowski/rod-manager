@@ -1,36 +1,45 @@
 
+from telnetlib import GA
+from urllib import response
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rodManager.dir_models.garden import Garden, PlotStatus
+from rodManager.dir_models.garden import Garden, GardenSerializer, PlotStatus
 from django.core import serializers
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from drf_spectacular.utils import OpenApiResponse, extend_schema, OpenApiParameter, inline_serializer
+from drf_spectacular.types import OpenApiTypes
 from rest_framework import status
-
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rodManager.libs.rodpagitation import RODPagination
+import drf_spectacular.serializers as drfserializers
 
 
 
 
-class GardensCRUD(APIView):
-    @swagger_auto_schema(
-    manual_parameters=[
-        openapi.Parameter("page",in_=openapi.IN_QUERY,type=openapi.TYPE_INTEGER),
-        openapi.Parameter("page_size",in_=openapi.IN_QUERY,type=openapi.TYPE_INTEGER),
+class GardensCRUD(APIView):  
+    queryset = Garden.objects.all()
+    serializer_class = GardenSerializer
+    pagination_class = RODPagination
+    @extend_schema(
+    summary="Get gardens",
+    description="Get all gardens.",
+    parameters=[
+        OpenApiParameter(name="page", type=OpenApiTypes.INT),
+        OpenApiParameter(name="page_size", type=OpenApiTypes.INT),
     ],
-    response= openapi.Response(
-        description="Garden list.",
-        type=openapi.TYPE_OBJECT,
-        items={
-            "count":openapi.Schema(type=openapi.TYPE_INTEGER),
-            "results":openapi.Items(type=openapi.TYPE_OBJECT),
-        })
-    )   
+    responses={
+        200: OpenApiResponse(
+            description="Garden list.",
+            response=GardenSerializer(many=True),
+        ),
+    }
+    
+    )
     def get(self, request):
         paginator = RODPagination()
         if  request.user.is_authenticated:
             gardens = paginator.paginate_queryset(Garden.objects.all().order_by("id"), request)
-            return paginator.get_paginated_response(serializers.serialize("json", gardens))
+            return paginator.get_paginated_response(GardenSerializer(gardens).data)
         else:
             return Response({"error": "You don't have permission to view gardens."}, status=status.HTTP_403_FORBIDDEN)
     
