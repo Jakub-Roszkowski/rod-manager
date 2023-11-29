@@ -8,7 +8,7 @@ votings_data = [
             {"label": 'Opcja 2', "optionId": 2, "votes": 0},
             {"label": 'Opcja 3', "optionId": 3, "votes": 0}
         ],
-        "finishDate": "2024-10-10T12:00:00"
+        "finishDate": "2024-10-10T12:00:00.000Z"
     },
     {
         "id": 2,
@@ -19,7 +19,7 @@ votings_data = [
             {"label": 'Opcja 2', "optionId": 2, "votes": 0},
             {"label": 'Opcja 3', "optionId": 3, "votes": 0}
         ],
-        "finishDate": "2024-10-20T12:00:00"
+        "finishDate": "2024-10-20T12:00:00.000Z"
     },
 
     {
@@ -32,7 +32,7 @@ votings_data = [
             {"optionId": 3, "label": 'Nie zgadzam się z propozycjami', "votes": 120},
             {"optionId": 4, "label": 'Wstrzymuję się od głosu', "votes": 120},
         ],
-        "finishDate": "2023-10-20T12:00:00"
+        "finishDate": "2023-10-20T12:00:00.000Z"
     },
     {
         "id": 4,
@@ -43,7 +43,7 @@ votings_data = [
             {"optionId": 2, "label": 'Sosnowy Gaj', "votes": 345},
             {"optionId": 3, "label": 'Brzozowy Zakątek', "votes": 25},
         ],
-        "finishDate": "2023-10-20T12:00:00"
+        "finishDate": "2023-10-20T12:00:00.000Z"
     },
     {
         "id": 5,
@@ -61,6 +61,6 @@ votings_data = [
             {"optionId": 9, "label": 'Peon', "votes": 28},
             {"optionId": 10, "label": 'Fiołek', "votes": 18}
         ],
-        "finishDate": "2023-10-01T12:00:00"
+        "finishDate": "2023-10-01T12:00:00.000Z"
     }
 ]

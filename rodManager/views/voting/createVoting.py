@@ -36,13 +36,13 @@ class AddVoting(APIView):
     )
     def post(self, request):
         # Trzeba tutaj uważać na date bo podaje razem ze strefą czasową
-        iso_date = request.data['finishDate']
+        # iso_date = request.data['finishDate']
+        #
+        # date_object = datetime.fromisoformat(iso_date.replace('Z', ''))
+        #
+        # new_votings = request.data
+        # newestvoting = str(date_object)
+        # new_votings['finishDate'] = newestvoting
 
-        date_object = datetime.fromisoformat(iso_date.replace('Z', ''))
-
-        new_votings = request.data
-        newestvoting = str(date_object)
-        new_votings['finishDate'] = newestvoting
-
-        votings.append(new_votings)
-        return Response(new_votings, status=status.HTTP_201_CREATED)
+        votings.append(request.data)
+        return Response(request.data, status=status.HTTP_201_CREATED)
