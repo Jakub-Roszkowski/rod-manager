@@ -3,6 +3,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from rodManager.users.validate import permission_required
+
 
 class WhoamiView(APIView):
     @extend_schema(
@@ -24,12 +26,8 @@ class WhoamiView(APIView):
             },
         },
     )
+    @permission_required()
     def get(self, request):
-        if not request.user.is_authenticated:
-            return Response(
-                {"error": "You are not logged in."},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
         return Response(
             {
                 "id": request.user.id,
