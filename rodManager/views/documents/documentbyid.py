@@ -1,17 +1,11 @@
-from django.contrib.auth.models import Group
 from drf_spectacular.utils import (
-    OpenApiParameter,
-    OpenApiResponse,
-    OpenApiTypes,
     extend_schema,
-    inline_serializer,
 )
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from rodManager.dir_models.document import Document
-from rodManager.users.validate import permission_required
 
 
 class UpdateDocumentSerializer(serializers.Serializer):

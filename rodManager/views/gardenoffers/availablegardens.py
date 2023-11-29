@@ -1,7 +1,5 @@
 from drf_spectacular.utils import (
-    OpenApiParameter,
     OpenApiResponse,
-    OpenApiTypes,
     extend_schema,
 )
 from rest_framework import status

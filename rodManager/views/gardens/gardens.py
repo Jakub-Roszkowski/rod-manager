@@ -1,18 +1,14 @@
 
-from telnetlib import GA
-from urllib import response
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from rodManager.dir_models.garden import Garden, GardenSerializer, PlotStatus
-from django.core import serializers
-from drf_spectacular.utils import OpenApiResponse, extend_schema, OpenApiParameter, inline_serializer
+from drf_spectacular.utils import OpenApiResponse, extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 from rest_framework import status
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rodManager.libs.rodpagitation import RODPagination
-import drf_spectacular.serializers as drfserializers
 
 
 

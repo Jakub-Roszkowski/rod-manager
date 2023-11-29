@@ -6,7 +6,6 @@ from rest_framework.views import APIView
 
 from rodManager.views.voting.votingsData import votings_data as votings
 
-from datetime import datetime
 
 class AddVoting(APIView):
     @swagger_auto_schema(

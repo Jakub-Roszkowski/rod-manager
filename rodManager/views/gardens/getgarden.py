@@ -5,8 +5,6 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from django.core import serializers
-from django.core.paginator import Paginator
-from rest_framework.pagination import PageNumberPagination
 
 from rodManager.libs.rodpagitation import RODPagination
 

@@ -1,19 +1,11 @@
 from drf_spectacular.utils import (
-    OpenApiExample,
-    OpenApiParameter,
-    OpenApiResponse,
-    OpenApiTypes,
     extend_schema,
-    extend_schema_field,
-    extend_schema_serializer,
 )
 from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from rodManager.dir_models.document import Document
-from rodManager.libs.rodpagitation import RODPagination
-from rodManager.users.validate import permission_required
 
 
 class DocumentPostSerializer(serializers.Serializer):
