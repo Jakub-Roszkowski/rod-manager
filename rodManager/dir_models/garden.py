@@ -22,13 +22,17 @@ class Garden(models.Model):
     ),
     last_leaseholder = models.ForeignKey(Account, on_delete=models.DO_NOTHING, null=True, blank=True, related_name="last_leaseholder")
 
-class GardenSerializer(serializers.ModelSerializer):
+class GardenNameSerializer(serializers.ModelSerializer):
     leaseholderID = AccountNameSerializer()
     last_leaseholder = AccountNameSerializer()
     class Meta:
         model = Garden
         fields = "__all__"
 
+class GardenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Garden
+        exclude = ["leaseholderID", "last_leaseholder"]
         
         
     
