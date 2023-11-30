@@ -1,6 +1,4 @@
-from drf_spectacular.utils import (
-    extend_schema,
-)
+from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,7 +9,7 @@ from rodManager.dir_models.document import Document
 class UpdateDocumentSerializer(serializers.Serializer):
     name = serializers.CharField(allow_null=False, required=False)
     parent = serializers.PrimaryKeyRelatedField(
-        queryset=Document.objects.filter(file__isnull=True),
+        queryset=Document.objects.filter(file=""),
         allow_null=True,
         required=False,
     )
