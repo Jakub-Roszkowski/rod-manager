@@ -164,6 +164,12 @@ AUTH_USER_MODEL = "rodManager.Account"
 MEDIA_ROOT = os.path.join(BASE_DIR, "mediafiles")
 MEDIA_URL = "/mediafiles/"
 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "rodzinneogrodkidzialkowe@gmail.com"
+EMAIL_HOST_PASSWORD = "dprhhxgrwdrjgqaz"
 
 # Google login app id
 

@@ -1,0 +1,6 @@
+Zgłoszenie Problemu Technicznego
+
+Imię i Nazwisko: {{imie_nazwisko}}
+Adres Email: {{email}}
+Temat Problemu: {{temat_problemu}}
+Opis Problemu: {{opis_problemu}}
