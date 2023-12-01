@@ -1,10 +1,7 @@
 from django.contrib.auth.models import Group
 from drf_spectacular.utils import (
-    OpenApiParameter,
     OpenApiResponse,
-    OpenApiTypes,
     extend_schema,
-    inline_serializer,
 )
 from rest_framework import serializers
 from rest_framework.response import Response

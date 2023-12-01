@@ -1,5 +1,5 @@
 from drf_spectacular.utils import OpenApiResponse, extend_schema
-from rest_framework import serializers, status
+from rest_framework import serializers
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from ..dir_models.account import Account

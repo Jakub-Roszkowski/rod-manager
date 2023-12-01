@@ -1,9 +1,6 @@
-from datetime import datetime
 
 from drf_spectacular.utils import (
-    OpenApiParameter,
     OpenApiResponse,
-    OpenApiTypes,
     extend_schema,
 )
 
