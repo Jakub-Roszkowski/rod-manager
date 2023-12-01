@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import pytz
 from drf_spectacular.utils import (
     OpenApiExample,
     OpenApiParameter,
@@ -31,6 +32,8 @@ class AddVotingSerializer(serializers.Serializer):
     end_date = serializers.DateTimeField()
 
     def create(self, validated_data):
+        if validated_data["end_date"] < datetime.now(pytz.utc):
+            raise serializers.ValidationError("Finish date must be in the future")
         poll = Poll.objects.create(
             title=validated_data["title"],
             description=validated_data["description"],

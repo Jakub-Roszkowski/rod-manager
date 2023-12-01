@@ -1,3 +1,6 @@
+from datetime import datetime
+
+import pytz
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import (
     OpenApiParameter,
@@ -19,6 +22,8 @@ class AddVoteSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         poll = get_object_or_404(Poll, pk=validated_data["poll_id"])
+        if poll.end_date < datetime.now(pytz.utc):
+            raise serializers.ValidationError("Pool is closed.")
         option = get_object_or_404(
             Option, option_id=validated_data["option_id"], poll=poll
         )
