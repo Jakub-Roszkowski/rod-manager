@@ -9,22 +9,22 @@ from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from rodManager.dir_models.pool import Option, Pool, Vote
+from rodManager.dir_models.poll import Option, Poll, Vote
 from rodManager.users.validate import permission_required
 
 
 class AddVoteSerializer(serializers.Serializer):
-    pool_id = serializers.IntegerField()
+    poll_id = serializers.IntegerField()
     option_id = serializers.IntegerField()
 
     def create(self, validated_data):
-        pool = get_object_or_404(Pool, pk=validated_data["pool_id"])
+        poll = get_object_or_404(Poll, pk=validated_data["poll_id"])
         option = get_object_or_404(
-            Option, option_id=validated_data["option_id"], pool=pool
+            Option, option_id=validated_data["option_id"], poll=poll
         )
         user = self.context["request"].user
 
-        vote = Vote.objects.filter(option__pool=pool, user=user).first()
+        vote = Vote.objects.filter(option__poll=poll, user=user).first()
         if vote:
             vote.option = option
             vote.save()
@@ -33,10 +33,10 @@ class AddVoteSerializer(serializers.Serializer):
         return vote
 
 
-class VoteOnPool(APIView):
+class VoteOnPoll(APIView):
     @extend_schema(
-        summary="Vote on pool",
-        description="Vote on pool",
+        summary="Vote on poll",
+        description="Vote on poll",
         request=AddVoteSerializer,
         responses={
             201: OpenApiResponse(description="Vote added successfully."),
