@@ -59,7 +59,7 @@ urlpatterns = [
     path("api/garden-offers/", include("rodManager.views.gardenoffers.urls")),
     path("api/announcements/", include("rodManager.views.announcements.urls")),
     path("api/accounts/", include("rodManager.views.accounts.urls")),
-    path("api/votings/", include("rodManager.views.voting.urls")),
+    path("api/pools/", include("rodManager.views.pools.urls")),
     path("api/my-garden/", include("rodManager.views.myGardenPlot.urls")),
     path("api/garden-info/", include("rodManager.views.gardenInfo.urls")),
     path("api/technical-problem/", include("rodManager.views.technicalProblem.urls")),
