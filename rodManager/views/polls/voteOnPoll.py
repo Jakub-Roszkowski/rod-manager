@@ -31,10 +31,8 @@ class AddVoteSerializer(serializers.Serializer):
 
         vote = Vote.objects.filter(option__poll=poll, user=user).first()
         if vote:
-            vote.option = option
-            vote.save()
-        else:
-            vote = Vote.objects.create(option=option, user=user)
+            raise serializers.ValidationError("You have already voted.")
+        vote = Vote.objects.create(option=option, user=user)
         return vote
 
 

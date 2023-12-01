@@ -14,6 +14,8 @@ class CurrentsPolls(APIView):
         responses={200: PollSerializer(many=True)},
     )
     def get(self, request):
-        polls = Poll.objects.filter(end_date__gte=datetime.now())
-        serializer = PollSerializer(polls, many=True)
+        polls = Poll.objects.filter(end_date__gte=datetime.now()).exclude(
+            options__votes__user=request.user
+        )
+        serializer = PollSerializer(polls, many=True, context={"request": request})
         return Response(serializer.data)

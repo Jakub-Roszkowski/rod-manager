@@ -41,7 +41,16 @@ class OptionSerializer(serializers.ModelSerializer):
 
 class PollSerializer(serializers.ModelSerializer):
     options = OptionSerializer(many=True)
+    user_vote = serializers.SerializerMethodField()
 
     class Meta:
         model = Poll
-        fields = ["id", "title", "description", "options", "end_date"]
+        fields = ["id", "title", "description", "options", "end_date", "user_vote"]
+
+    def get_user_vote(self, obj):
+        request = self.context.get("request", None)
+        if request:
+            vote = Vote.objects.filter(option__in=obj.options.all(), user=request.user)
+            if vote:
+                return vote[0].option.option_id
+        return None
