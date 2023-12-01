@@ -4,7 +4,7 @@ from urllib import response
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rodManager.dir_models.garden import Garden, GardenNameSerializer, PlotStatus, GardenSerializer
-from django.core import serializers
+from rest_framework import serializers
 from drf_spectacular.utils import OpenApiResponse, extend_schema, OpenApiParameter, inline_serializer
 from drf_spectacular.types import OpenApiTypes
 from rest_framework import status
@@ -86,43 +86,41 @@ class GardensCRUD(APIView):
     
     @extend_schema(
     summary="Edit garden",
-    parameters=[
-        OpenApiParameter(name="id", type=OpenApiTypes.INT),
-        OpenApiParameter(name="sector", type=OpenApiTypes.STR),
-        OpenApiParameter(name="avenue", type=OpenApiTypes.STR),
-        OpenApiParameter(name="number", type=OpenApiTypes.INT),
-        OpenApiParameter(name="area", type=OpenApiTypes.INT),
-        OpenApiParameter(name="status", type=OpenApiTypes.STR),
-        OpenApiParameter(name="leaseholderID", type=OpenApiTypes.INT),
-    ],
-    request=inline_serializer("Garden", fields={
-        "id": int,
-        "sector": str,
-        "avenue": str,
-        "number": str,
-        "area": str,
-        "leaseholderID": str,
-    }),
+    request=inline_serializer(
+        name="EditGarden",
+        fields={
+            "id": serializers.IntegerField(),
+            "sector": serializers.CharField(),
+            "avenue": serializers.CharField(),
+            "number": serializers.IntegerField(),
+            "area": serializers.FloatField(),
+            "leaseholderID": serializers.IntegerField(),
+            "status": serializers.CharField(),
+        },
+    ),  
+   
     )
-    def put(self, request):
+    def patch(self, request):
         if not request.user.is_authenticated:
             return Response({"error": "You don't have permission to edit gardens."}, status=status.HTTP_403_FORBIDDEN)
         if not request.data["id"]:
                 return Response({"error": "Garden ID is required."}, status=status.HTTP_400_BAD_REQUEST)
-        if not request.data["sector"] or not request.data["avenue"] or not request.data["number"] or not request.data["area"] or not request.data["status"]:
-                return Response({"error": "Sector, avenue, number, area and status are required."}, status=status.HTTP_400_BAD_REQUEST)
-        if request.data["status"] not in ["dostępna", "niedostępna"]:
-            return Response({"error": "Status must be dostępna or niedostępna."}, status=status.HTTP_400_BAD_REQUEST)
-        if not Garden.objects.filter(
-            id = request.data["id"],
-            sector=request.data["sector"],
-            avenue=request.data["avenue"],
-            number=request.data["number"],
-        ).exists():
+        if not Garden.objects.filter(id=request.data["id"]).exists():
             return Response({"error": "Garden doesn't exist."}, status=status.HTTP_400_BAD_REQUEST)
         garden = Garden.objects.get(id=request.data["id"])
-        garden.leaseholderID = request.data["leaseholderID"]
-        garden.status = request.data["status"]
+        if request.data.get("sector"):
+            garden.sector = request.data["sector"]
+        if request.data.get("avenue"):
+            garden.avenue = request.data["avenue"]
+        if request.data.get("number"):
+            garden.number = request.data["number"]
+        if request.data.get("area"):
+            garden.area = request.data["area"]
+        if request.data.get("leaseholderID"):
+            garden.last_leaseholder = garden.leaseholderID
+            garden.leaseholderID = request.data["leaseholderID"]
+        if request.data.get("status"):
+            garden.status = request.data["status"]
         garden.save()
         return Response({"success": "Garden edited successfully."}, status=status.HTTP_200_OK)  
         
