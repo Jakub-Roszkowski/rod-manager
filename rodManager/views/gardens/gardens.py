@@ -95,7 +95,15 @@ class GardensCRUD(APIView):
         OpenApiParameter(name="area", type=OpenApiTypes.INT),
         OpenApiParameter(name="status", type=OpenApiTypes.STR),
         OpenApiParameter(name="leaseholderID", type=OpenApiTypes.INT),
-    ]
+    ],
+    request=inline_serializer("Garden", fields={
+        "id": int,
+        "sector": str,
+        "avenue": str,
+        "number": str,
+        "area": str,
+        "leaseholderID": str,
+    }),
     )
     def put(self, request):
         if not request.user.is_authenticated:
