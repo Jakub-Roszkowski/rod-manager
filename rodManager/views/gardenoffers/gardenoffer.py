@@ -208,9 +208,9 @@ class GardenOfferView(APIView):
                 },
                 "garden_info": {
                     "address": str(garden_offer.garden.sector)
-                    + ","
+                    + ", "
                     + str(garden_offer.garden.avenue)
-                    + ","
+                    + ", "
                     + str(garden_offer.garden.number),
                     "area": garden_offer.garden.area,
                     "price": garden_offer.price,
