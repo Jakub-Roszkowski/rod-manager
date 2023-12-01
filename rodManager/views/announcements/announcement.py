@@ -4,15 +4,12 @@ import uuid
 from bs4 import BeautifulSoup
 from django.core.files.base import ContentFile
 from django.db.models import Count, Q
-from drf_spectacular import openapi
 from drf_spectacular.utils import (
     OpenApiParameter,
     OpenApiResponse,
     OpenApiTypes,
     extend_schema,
 )
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
 from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView

@@ -1,12 +1,9 @@
 from django.db.models import Max, Min
 from drf_spectacular.utils import (
-    OpenApiParameter,
     OpenApiResponse,
-    OpenApiTypes,
     extend_schema,
 )
 from rest_framework import status
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 

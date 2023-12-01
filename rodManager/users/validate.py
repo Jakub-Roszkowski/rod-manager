@@ -15,6 +15,8 @@ def permission_required(permissionsList=None):
                     return view_func(request, *args, **kwargs)
                 if request.request.user.groups.filter(name="ADMIN").exists():
                     return view_func(request, *args, **kwargs)
+                if permissionsList is None:
+                    return view_func(request, *args, **kwargs)
                 if isinstance(permissionsList, str):
                     if request.request.user.has_perm(permissionsList):
                         return view_func(request, *args, **kwargs)

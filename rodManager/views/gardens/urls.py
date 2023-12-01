@@ -1,6 +1,5 @@
 
-from django.urls import include, path
-import os
+from django.urls import path
 
 import rodManager.views.gardens.gardenlist as gardenlist
 import rodManager.views.gardens.profilefromgarden as profilefromgarden
