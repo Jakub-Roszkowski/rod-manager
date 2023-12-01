@@ -38,7 +38,7 @@ class GardensCRUD(APIView):
     def get(self, request):
         paginator = RODPagination()
         if  request.user.is_authenticated:
-            gardens = paginator.paginate_queryset(Garden.objects.all().order_by("id"), request)
+            gardens = paginator.paginate_queryset(Garden.objects.all().order_by("sector").order_by("avenue"), request)
             return paginator.get_paginated_response(GardenNameSerializer(gardens, many=True).data)
         else:
             return Response({"error": "You don't have permission to view gardens."}, status=status.HTTP_403_FORBIDDEN)
@@ -138,8 +138,8 @@ class GardensCRUD(APIView):
     def delete(self, request):
         if not request.user.is_authenticated:
             return Response({"error": "You don't have permission to delete gardens."}, status=status.HTTP_403_FORBIDDEN)
-        if Garden.objects.filter(id=request.data["id"]).exists():
-            Garden.objects.get(id=request.data["id"]).delete()
+        if Garden.objects.filter(id=request.query_params["id"]).exists():
+            Garden.objects.get(id=request.query_params["id"]).delete()
             return Response({"success": "Garden deleted successfully."}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Garden doesn't exist."}, status=status.HTTP_400_BAD_REQUEST)
