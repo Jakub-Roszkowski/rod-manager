@@ -28,13 +28,13 @@ class AddVotingSerializer(serializers.Serializer):
     title = serializers.CharField()
     description = serializers.CharField()
     options = AddOptionSerializer(many=True)
-    finish_date = serializers.DateTimeField()
+    end_date = serializers.DateTimeField()
 
     def create(self, validated_data):
         poll = Poll.objects.create(
             title=validated_data["title"],
             description=validated_data["description"],
-            end_date=validated_data["finish_date"],
+            end_date=validated_data["end_date"],
         )
         for option in validated_data["options"]:
             Option.objects.create(
