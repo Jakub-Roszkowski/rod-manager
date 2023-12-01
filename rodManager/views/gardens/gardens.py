@@ -39,7 +39,7 @@ class GardensCRUD(APIView):
         paginator = RODPagination()
         if  request.user.is_authenticated:
             gardens = paginator.paginate_queryset(Garden.objects.all().order_by("id"), request)
-            return paginator.get_paginated_response(GardenNameSerializer(gardens).data)
+            return paginator.get_paginated_response(GardenNameSerializer(gardens, many=True).data)
         else:
             return Response({"error": "You don't have permission to view gardens."}, status=status.HTTP_403_FORBIDDEN)
     
