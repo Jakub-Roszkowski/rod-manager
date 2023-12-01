@@ -28,7 +28,7 @@ employers = [
     }
 ]
 
-class GardenInfoApi(APIView):
+class RODInfoApi(APIView):
 
     @swagger_auto_schema(
         operation_summary="Get all employers",

@@ -131,4 +131,14 @@ class MetersCRUD(APIView):
         ),
     }
     )
-    def delete(self, request)
+    def delete(self, request):
+        if request.user.is_authenticated:
+            if not request.data.get("serial"):
+                return Response({"error": "Serial is required."}, status=status.HTTP_400_BAD_REQUEST)
+            if not Meter.objects.filter(serial=request.data["serial"]).exists():
+                return Response({"error": "Meter does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+            Meter.objects.get(serial=request.data["serial"]).delete()
+            return Response({"message": "Meter deleted."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "You don't have permission to delete meters."}, status=status.HTTP_403_FORBIDDEN)
+        
