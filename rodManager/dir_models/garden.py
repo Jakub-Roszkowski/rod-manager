@@ -19,7 +19,7 @@ class Garden(models.Model):
         max_length=20,
         choices=PlotStatus.choices,
         default=PlotStatus.AVAILABLE,
-    ),
+    )
     last_leaseholder = models.ForeignKey(Account, on_delete=models.DO_NOTHING, null=True, blank=True, related_name="last_leaseholder")
 
 class GardenNameSerializer(serializers.ModelSerializer):
