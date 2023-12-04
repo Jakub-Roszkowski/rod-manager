@@ -1,5 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers, status
+
+from rodManager.dir_models.account import Account
 
 
 class ComplaintStatus(models.TextChoices):
@@ -10,24 +13,72 @@ class ComplaintStatus(models.TextChoices):
     REJECTED = "Rejected", _("Odrzucono")
 
 
+class MessageAuthor(models.TextChoices):
+    USER = "USER", _("Użytkownik")
+    MANAGER = "MANAGER", _("Zarządca")
+
+
 class Complaint(models.Model):
     title = models.CharField(max_length=255)
-    opening_date = models.DateTimeField(auto_now_add=True)
-    closing_date = models.DateTimeField(null=True, blank=True)
-    state = models.CharField(max_length=255)
-    status = models.CharField(
+    open_date = models.DateTimeField(auto_now_add=True)
+    close_date = models.DateTimeField(null=True, blank=True)
+    state = models.CharField(
         max_length=20,
         choices=ComplaintStatus.choices,
         default=ComplaintStatus.REPORTED,
     )
+    user = models.ForeignKey(
+        Account, related_name="complaints", on_delete=models.CASCADE
+    )
+
+    def last_update_date(self):
+        return None
+        if self.messages.all().last().creation_date:
+            return self.messages.all().last().creation_date
+        else:
+            return self.open_date
 
 
 class Message(models.Model):
     complaint = models.ForeignKey(
         Complaint, related_name="messages", on_delete=models.CASCADE
     )
-    author = models.ForeignKey(
-        Account, related_name="messages", on_delete=models.CASCADE
+    author = models.CharField(
+        max_length=20,
+        choices=MessageAuthor.choices,
+        default=MessageAuthor.USER,
     )
     content = models.TextField()
     creation_date = models.DateTimeField(auto_now_add=True)
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = [
+            "id",
+            "author",
+            "content",
+            "creation_date",
+        ]
+
+
+class ComplaintSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    messages = MessageSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Complaint
+        fields = [
+            "id",
+            "title",
+            "open_date",
+            "close_date",
+            "last_update_date",
+            "state",
+            "user",
+            "messages",
+        ]
+
+    def get_user(self, obj):
+        return obj.user.email
