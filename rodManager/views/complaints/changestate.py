@@ -19,34 +19,34 @@ from rodManager.dir_models.complaint import (
 )
 from rodManager.libs.rodpagitation import RODPagination
 from rodManager.users.validate import permission_required
+from rodManager.views.payments.edits import FeeListSerializer, FeeSerializer
 
 
 class ChangeStateSerializer(serializers.Serializer):
-    state = models.CharField(
-        max_length=20,
-        choices=ComplaintStatus.choices,
-        default=ComplaintStatus.REPORTED,
-    )
+    state = serializers.CharField()
+
+    def validate_state(self, value):
+        if value in [
+            ComplaintStatus.ACCEPTED,
+            ComplaintStatus.INPROGRESS,
+            ComplaintStatus.COMPLETE,
+            ComplaintStatus.REJECTED,
+        ]:
+            return value
+        raise serializers.ValidationError("Wrong state")
 
 
 class ChangeState(APIView):
     @extend_schema(
         summary="Change complaint state",
-        description="Change complaint state",
-        parameters=[
-            OpenApiParameter(
-                name="complaint_id",
-                type=OpenApiTypes.INT,
-                description="Complaint id",
-            )
-        ],
+        description="Change complaint state, available states: Accepted, InProgress, Complete, Rejected.",
         request=ChangeStateSerializer,
         responses=ComplaintSerializer,
     )
     @permission_required("rodManager.change_complaint")
     def patch(self, request, complaint_id):
         complaints = (
-            Complaint.objects.filter(id=complaint_id)
+            Complaint.objects.filter(id=complaint_id, manager=request.user)
             .annotate(
                 last_update_date=Coalesce(
                     Max("messages__creation_date"), F("open_date")
@@ -56,8 +56,16 @@ class ChangeState(APIView):
         )
         if complaints.exists():
             complaint = complaints.first()
-            complaint.state = request.data["state"]
-            complaint.close_date = timezone.now()
-            complaint.save()
-            return Response(status=status.HTTP_200_OK)
+            serializer = ChangeStateSerializer(data=request.data)
+            if serializer.is_valid():
+                complaint.state = serializer.validated_data["state"]
+                if (
+                    complaint.state == ComplaintStatus.COMPLETE
+                    or complaint.state == ComplaintStatus.REJECTED
+                ):
+                    complaint.close_date = timezone.now()
+                complaint.save()
+                response_serializer = ComplaintSerializer(complaint)
+                return Response(response_serializer.data, status=200)
+            return Response(serializer.errors, status=400)
         return Response(status=status.HTTP_404_NOT_FOUND)
