@@ -53,7 +53,7 @@ class ComplaintView(APIView):
     def get(self, request):
         # print first complaint
         if request.user.groups.filter(
-            name__in=["MANAGER", "TECHNICAL_EMPLOYEE", "ADMIN"]
+            name__in=["MANAGER", "NON_TECHNICAL_EMPLOYEE", "ADMIN"]
         ).exists():
             complaints = (
                 Complaint.objects.filter(Q(manager=request.user) | Q(manager=None))
