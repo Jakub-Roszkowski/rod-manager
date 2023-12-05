@@ -32,7 +32,6 @@ class Complaint(models.Model):
     )
 
     def last_update_date(self):
-        return None
         if self.messages.all().last().creation_date:
             return self.messages.all().last().creation_date
         else:

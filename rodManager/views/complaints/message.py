@@ -40,16 +40,6 @@ class AddMessageSerializer(serializers.Serializer):
 
 class MessageView(APIView):
     @extend_schema(
-        summary="Get messages",
-        description="Get all messages in the system.",
-        responses=ComplaintSerializer,
-    )
-    def get(self, request):
-        messages = Message.objects.all()
-        serializer = ComplaintSerializer(messages, many=True)
-        return Response(serializer.data, status=200)
-
-    @extend_schema(
         summary="Create message",
         description="Create a new message.",
         request=AddMessageSerializer,
