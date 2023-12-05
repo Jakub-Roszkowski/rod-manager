@@ -30,6 +30,7 @@ class Complaint(models.Model):
     user = models.ForeignKey(
         Account, related_name="complaints", on_delete=models.CASCADE
     )
+    manager = models.ForeignKey(Account, on_delete=models.CASCADE, null=True)
 
     def last_update_date(self):
         if self.messages.all().last().creation_date:
@@ -64,6 +65,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
 class ComplaintSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
+    manager = serializers.SerializerMethodField()
     messages = MessageSerializer(many=True, read_only=True)
 
     class Meta:
@@ -76,8 +78,42 @@ class ComplaintSerializer(serializers.ModelSerializer):
             "last_update_date",
             "state",
             "user",
+            "manager",
             "messages",
         ]
 
     def get_user(self, obj):
         return obj.user.email
+
+    def get_manager(self, obj):
+        if obj.manager:
+            return obj.manager.email
+        else:
+            return None
+
+
+class ComplainsWithoutMassagesSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    manager = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Complaint
+        fields = [
+            "id",
+            "title",
+            "open_date",
+            "close_date",
+            "last_update_date",
+            "state",
+            "user",
+            "manager",
+        ]
+
+    def get_user(self, obj):
+        return obj.user.email
+
+    def get_manager(self, obj):
+        if obj.manager:
+            return obj.manager.email
+        else:
+            return None

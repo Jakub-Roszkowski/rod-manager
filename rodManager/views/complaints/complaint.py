@@ -1,4 +1,4 @@
-from django.db.models import F, Max
+from django.db.models import F, Max, Q
 from django.db.models.functions import Coalesce
 from drf_spectacular.utils import (
     OpenApiParameter,
@@ -10,17 +10,30 @@ from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from rodManager.dir_models.complaint import Complaint, ComplaintSerializer
+from rodManager.dir_models.complaint import (
+    ComplainsWithoutMassagesSerializer,
+    Complaint,
+    ComplaintSerializer,
+    Message,
+    MessageAuthor,
+)
 from rodManager.libs.rodpagitation import RODPagination
 from rodManager.users.validate import permission_required
 
 
 class AddComplaintSerializer(serializers.Serializer):
     title = serializers.CharField()
+    message = serializers.CharField()
 
     def create(self, validated_data):
         user = validated_data["user"]
         complaint = Complaint.objects.create(title=validated_data["title"], user=user)
+        message = Message.objects.create(
+            author=MessageAuthor.USER,
+            content=validated_data["message"],
+            complaint=complaint,
+        )
+        message.save()
         return complaint
 
 
@@ -39,19 +52,17 @@ class ComplaintView(APIView):
     @permission_required()
     def get(self, request):
         # print first complaint
-        if (
-            request.user.groups.filter(name="MANAGER").exists()
-            or request.user.groups.filter(name="NON_TECHNICAL_EMPLOYEE").exists()
-            or request.user.groups.filter(name="ADMIN").exists()
-        ):
+        if request.user.groups.filter(
+            name__in=["MANAGER", "TECHNICAL_EMPLOYEE", "ADMIN"]
+        ).exists():
             complaints = (
-                Complaint.objects.all()
+                Complaint.objects.filter(Q(manager=request.user) | Q(manager=None))
                 .annotate(
                     last_update_date=Coalesce(
                         Max("messages__creation_date"), F("open_date")
                     )
                 )
-                .order_by("-last_update_date")
+                .order_by("last_update_date")
             )
         else:
             complaints = (
@@ -61,9 +72,9 @@ class ComplaintView(APIView):
                         Max("messages__creation_date"), F("open_date")
                     )
                 )
-                .order_by(F("-last_update_date"))
+                .order_by(F("last_update_date"))
             )
-        serializer = ComplaintSerializer(complaints, many=True)
+        serializer = ComplainsWithoutMassagesSerializer(complaints, many=True)
         paginator = RODPagination()
         page = paginator.paginate_queryset(serializer.data, request)
         return paginator.get_paginated_response(page)

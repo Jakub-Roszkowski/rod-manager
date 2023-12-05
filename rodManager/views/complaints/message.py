@@ -8,6 +8,7 @@ from rodManager.dir_models.complaint import (
     ComplaintSerializer,
     Message,
     MessageAuthor,
+    MessageSerializer,
 )
 
 
@@ -43,13 +44,12 @@ class MessageView(APIView):
         summary="Create message",
         description="Create a new message.",
         request=AddMessageSerializer,
-        responses=ComplaintSerializer,
+        responses=MessageSerializer,
     )
     def post(self, request):
         serializer = AddMessageSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user)
-            complaint = serializer.validated_data["complaint"]
-            response_serializer = ComplaintSerializer(complaint)
+            response_serializer = MessageSerializer(serializer.instance)
             return Response(response_serializer.data, status=201)
         return Response(serializer.errors, status=400)
