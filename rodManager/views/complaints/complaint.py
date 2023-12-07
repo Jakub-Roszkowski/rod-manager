@@ -62,7 +62,7 @@ class ComplaintView(APIView):
                         Max("messages__creation_date"), F("open_date")
                     )
                 )
-                .order_by("last_update_date")
+                .order_by("-last_update_date")
             )
         else:
             complaints = (
@@ -72,7 +72,7 @@ class ComplaintView(APIView):
                         Max("messages__creation_date"), F("open_date")
                     )
                 )
-                .order_by(F("last_update_date"))
+                .order_by("-last_update_date")
             )
         serializer = ComplainsWithoutMassagesSerializer(complaints, many=True)
         paginator = RODPagination()
