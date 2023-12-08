@@ -2,7 +2,7 @@ from django.db import models
 from rest_framework import serializers
 
 
-class Pool(models.Model):
+class Poll(models.Model):
     id = models.AutoField(primary_key=True)
     end_date = models.DateTimeField()
     title = models.CharField(max_length=200)
@@ -13,7 +13,7 @@ class Option(models.Model):
     id = models.AutoField(primary_key=True)
     option_id = models.IntegerField()
     label = models.CharField(max_length=200)
-    pool = models.ForeignKey("Pool", on_delete=models.CASCADE, related_name="options")
+    poll = models.ForeignKey("Poll", on_delete=models.CASCADE, related_name="options")
 
 
 class Vote(models.Model):
@@ -39,9 +39,18 @@ class OptionSerializer(serializers.ModelSerializer):
         return Vote.objects.filter(option=obj).count()
 
 
-class PoolSerializer(serializers.ModelSerializer):
+class PollSerializer(serializers.ModelSerializer):
     options = OptionSerializer(many=True)
+    user_vote = serializers.SerializerMethodField()
 
     class Meta:
-        model = Pool
-        fields = ["id", "title", "description", "options", "end_date"]
+        model = Poll
+        fields = ["id", "title", "description", "options", "end_date", "user_vote"]
+
+    def get_user_vote(self, obj):
+        request = self.context.get("request", None)
+        if request:
+            vote = Vote.objects.filter(option__in=obj.options.all(), user=request.user)
+            if vote:
+                return vote[0].option.option_id
+        return None

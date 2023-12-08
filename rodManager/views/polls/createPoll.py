@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import pytz
 from drf_spectacular.utils import (
     OpenApiExample,
     OpenApiParameter,
@@ -10,11 +11,11 @@ from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from rodManager.dir_models.pool import (
+from rodManager.dir_models.poll import (
     Option,
     OptionSerializer,
-    Pool,
-    PoolSerializer,
+    Poll,
+    PollSerializer,
     Vote,
 )
 
@@ -28,19 +29,21 @@ class AddVotingSerializer(serializers.Serializer):
     title = serializers.CharField()
     description = serializers.CharField()
     options = AddOptionSerializer(many=True)
-    finish_date = serializers.DateTimeField()
+    end_date = serializers.DateTimeField()
 
     def create(self, validated_data):
-        pool = Pool.objects.create(
+        if validated_data["end_date"] < datetime.now(pytz.utc):
+            raise serializers.ValidationError("Finish date must be in the future")
+        poll = Poll.objects.create(
             title=validated_data["title"],
             description=validated_data["description"],
-            end_date=validated_data["finish_date"],
+            end_date=validated_data["end_date"],
         )
         for option in validated_data["options"]:
             Option.objects.create(
-                label=option["label"], option_id=option["option_id"], pool=pool
+                label=option["label"], option_id=option["option_id"], poll=poll
             )
-        return pool
+        return poll
 
 
 #    def validate(self, data):
@@ -49,12 +52,12 @@ class AddVotingSerializer(serializers.Serializer):
 #        return data
 
 
-class CreatePool(APIView):
+class CreatePoll(APIView):
     @extend_schema(
-        summary="Add pool",
-        description="Add new pool.",
+        summary="Add poll",
+        description="Add new poll.",
         request=AddVotingSerializer,
-        responses={201: PoolSerializer},
+        responses={201: PollSerializer},
     )
     def post(self, request):
         # Trzeba tutaj uważać na date bo podaje razem ze strefą czasową
@@ -69,5 +72,5 @@ class CreatePool(APIView):
         serializer = AddVotingSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        serializer = PoolSerializer(serializer.instance)
+        serializer = PollSerializer(serializer.instance)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

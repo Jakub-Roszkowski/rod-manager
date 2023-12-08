@@ -27,7 +27,12 @@ DEBUG = bool(os.environ.get("DEBUG", default=1))
 # 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a space between each.
 # For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", default="*").split(" ")
-
+# ALLOWED_HOSTS = [
+#     'localhost',
+#     '127.0.0.1',
+#     '[::1]',
+#     '192.168.137.1',  # Dodaj ten adres IP do dozwolonych hostów
+# ]
 
 # Application definition
 

@@ -1,8 +1,5 @@
 from django.contrib.auth.models import Group
-from drf_spectacular.utils import (
-    OpenApiResponse,
-    extend_schema,
-)
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -63,7 +60,7 @@ class AccountByIdView(APIView):
             ),
         },
     )
-    @permission_required("rodManager.view_account")
+    @permission_required()
     def get(self, request, account_id):
         try:
             account = Account.objects.get(id=account_id)
@@ -75,6 +72,12 @@ class AccountByIdView(APIView):
                 "phone": account.phone,
                 "groups": [group.name for group in account.groups.all()],
             }
+
+            if (
+                not request.user.groups.filter(name__in=["MANAGER", "ADMIN"]).exists()
+                and request.user != account
+            ):
+                return Response({"error": "You cannot view this account."}, status=400)
 
             return Response(response_data)
         except Account.DoesNotExist:
@@ -110,21 +113,21 @@ class AccountByIdView(APIView):
             ),
         },
     )
-    @permission_required("rodManager.change_account")
-    def put(self, request, account_id):
+    @permission_required()
+    def patch(self, request, account_id):
         try:
             account = Account.objects.get(id=account_id)
             if (
-                request.user.groups.filter(name="MANAGER").exists()
+                account.groups.filter(name__in=["MANAGER", "ADMIN"]).exists()
                 and not request.user.groups.filter(name="ADMIN").exists()
+                and account != request.user
+            ) or (
+                account != request.user
+                and not request.user.groups.filter(
+                    name__in=["MANAGER", "ADMIN"]
+                ).exists()
             ):
-                if (
-                    account.groups.filter(name="MANAGER").exists()
-                    or account.groups.filter(name="ADMIN").exists()
-                ):
-                    return Response(
-                        {"error": "You cannot change managers or admins."}, status=400
-                    )
+                return Response({"error": "You cannot edit this account."}, status=400)
             serializer = UpdateAccountSerializer(
                 instance=account, data=request.data, partial=True
             )
