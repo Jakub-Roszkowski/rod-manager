@@ -14,6 +14,7 @@ from rodManager.dir_models.complaint import (
     ComplainsWithoutMassagesSerializer,
     Complaint,
     ComplaintSerializer,
+    ComplaintStatus,
     Message,
     MessageAuthor,
 )
@@ -46,12 +47,23 @@ class ComplaintView(APIView):
         parameters=[
             OpenApiParameter(name="page", type=OpenApiTypes.INT),
             OpenApiParameter(name="page_size", type=OpenApiTypes.INT),
+            OpenApiParameter(name="state", type=OpenApiTypes.STR),
         ],
         responses=ComplaintSerializer(many=True),
     )
     @permission_required()
     def get(self, request):
-        # print first complaint
+        state = self.request.query_params.get("state", None)
+        if state:
+            if state not in [
+                ComplaintStatus.ACCEPTED,
+                ComplaintStatus.INPROGRESS,
+                ComplaintStatus.COMPLETE,
+                ComplaintStatus.REJECTED,
+            ]:
+                return Response(
+                    {"state": ["Wrong state"]}, status=status.HTTP_400_BAD_REQUEST
+                )
         if request.user.groups.filter(
             name__in=["MANAGER", "NON_TECHNICAL_EMPLOYEE", "ADMIN"]
         ).exists():
@@ -74,6 +86,8 @@ class ComplaintView(APIView):
                 )
                 .order_by("-last_update_date")
             )
+        if state is not None:
+            complaints = complaints.filter(state=state)
         serializer = ComplainsWithoutMassagesSerializer(complaints, many=True)
         paginator = RODPagination()
         page = paginator.paginate_queryset(serializer.data, request)
