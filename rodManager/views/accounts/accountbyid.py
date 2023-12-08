@@ -73,10 +73,7 @@ class AccountByIdView(APIView):
                 "groups": [group.name for group in account.groups.all()],
             }
 
-            if (
-                account.groups.filter(name__in=["MANAGER", "ADMIN"]).exists()
-                and account != request.user
-            ):
+            if not account.groups.filter(name__in=["MANAGER", "ADMIN"]).exists():
                 return Response({"error": "You cannot view this account."}, status=400)
 
             return Response(response_data)
