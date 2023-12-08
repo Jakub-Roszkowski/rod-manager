@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes, OpenApiResponse
 
 
-class RecordsCRUD(ApiView):
+class RecordsCRUD(APIView):
     """
     Records CRUD
     """
