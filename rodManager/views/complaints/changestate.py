@@ -27,6 +27,7 @@ class ChangeStateSerializer(serializers.Serializer):
 
     def validate_state(self, value):
         if value in [
+            ComplaintStatus.REPORTED,
             ComplaintStatus.ACCEPTED,
             ComplaintStatus.INPROGRESS,
             ComplaintStatus.COMPLETE,

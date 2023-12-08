@@ -56,6 +56,7 @@ class ComplaintView(APIView):
         state = self.request.query_params.get("state", None)
         if state:
             if state not in [
+                ComplaintStatus.REPORTED,
                 ComplaintStatus.ACCEPTED,
                 ComplaintStatus.INPROGRESS,
                 ComplaintStatus.COMPLETE,
