@@ -4,19 +4,18 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('rodManager', '0014_payment_alter_garden_id_document'),
+        ("rodManager", "0014_payment_alter_garden_id_document"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='document',
-            old_name='title',
-            new_name='name',
+            model_name="managerdocument",
+            old_name="title",
+            new_name="name",
         ),
         migrations.RemoveField(
-            model_name='document',
-            name='uuid',
+            model_name="managerdocument",
+            name="uuid",
         ),
     ]

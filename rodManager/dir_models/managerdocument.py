@@ -1,13 +1,13 @@
 from django.db import models
 
 
-class Document(models.Model):
+class ManagerDocument(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     parent = models.ForeignKey(
         "self", null=True, blank=True, related_name="children", on_delete=models.CASCADE
     )
-    file = models.FileField(upload_to="documents/", null=True, blank=True)
+    file = models.FileField(upload_to="managerdocuments/", null=True, blank=True)
 
     def to_dict(self):
         result = {"id": self.id, "name": self.name}
