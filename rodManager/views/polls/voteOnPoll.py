@@ -47,7 +47,7 @@ class VoteOnPoll(APIView):
             404: OpenApiResponse(description="Voting not found."),
         },
     )
-    @permission_required("rodManager.add_vote")
+    @permission_required()
     def post(self, request):
         serializer = AddVoteSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
