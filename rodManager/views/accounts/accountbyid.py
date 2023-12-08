@@ -120,7 +120,7 @@ class AccountByIdView(APIView):
                 and account != request.user
             ) or (
                 account != request.user
-                or not request.user.groups.filter(
+                and not request.user.groups.filter(
                     name__in=["MANAGER", "ADMIN"]
                 ).exists()
             ):
