@@ -32,7 +32,7 @@ class GardenNameSerializer(serializers.ModelSerializer):
 class GardenSerializer(serializers.ModelSerializer):
     class Meta:
         model = Garden
-        exclude = ["leaseholderID", "last_leaseholder"]
+        exclude = [ "last_leaseholder"]
         
         
     

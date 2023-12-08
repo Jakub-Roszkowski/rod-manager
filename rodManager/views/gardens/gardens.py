@@ -3,6 +3,7 @@ from telnetlib import GA
 from urllib import response
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rodManager.dir_models.account import Account
 from rodManager.dir_models.garden import Garden, GardenNameSerializer, PlotStatus, GardenSerializer
 from rest_framework import serializers
 from drf_spectacular.utils import OpenApiResponse, extend_schema, OpenApiParameter, inline_serializer
@@ -76,7 +77,7 @@ class GardensCRUD(APIView):
                 avenue=request.data["avenue"],
                 number=request.data["number"],
                 area=request.data["area"],
-                leaseholderID=request.data["leaseholderID"],
+                leaseholderID=Account.objects.get(id=request.data["leaseholderID"])
             )
             newgarden.save()
             return Response({"success": "Garden created successfully."}, status=status.HTTP_201_CREATED)
@@ -119,7 +120,7 @@ class GardensCRUD(APIView):
             garden.area = request.data["area"]
         if request.data.get("leaseholderID"):
             garden.last_leaseholder = garden.leaseholderID
-            garden.leaseholderID = request.data["leaseholderID"]
+            garden.leaseholderID = Account.objects.get(id = request.data["leaseholderID"])
         if request.data.get("status"):
             garden.status = request.data["status"]
         garden.save()
