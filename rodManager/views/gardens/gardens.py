@@ -76,6 +76,7 @@ class GardensCRUD(APIView):
                 avenue=request.data["avenue"],
                 number=request.data["number"],
                 area=request.data["area"],
+                leaseholderID=request.data["leaseholderID"],
             )
             newgarden.save()
             return Response({"success": "Garden created successfully."}, status=status.HTTP_201_CREATED)
