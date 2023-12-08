@@ -56,7 +56,7 @@ class ChangeState(APIView):
         )
         if complaints.exists():
             complaint = complaints.first()
-            if complaint.manager is None:
+            if complaint.manager is None and complaint.user != request.user:
                 complaint.manager = request.user
                 complaint.save()
             if complaint.manager != request.user:
