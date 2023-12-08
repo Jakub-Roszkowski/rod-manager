@@ -56,7 +56,12 @@ class ChangeState(APIView):
         )
         if complaints.exists():
             complaint = complaints.first()
-            if complaint.manager is None and complaint.user != request.user:
+            if complaint.user == request.user:
+                return Response(
+                    status=status.HTTP_403_FORBIDDEN,
+                    data="Cannot change state of your own complaint.",
+                )
+            if complaint.manager is None:
                 complaint.manager = request.user
                 complaint.save()
             if complaint.manager != request.user:
