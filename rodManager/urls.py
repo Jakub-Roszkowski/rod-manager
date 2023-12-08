@@ -61,7 +61,7 @@ urlpatterns = [
     path("api/accounts/", include("rodManager.views.accounts.urls")),
     path("api/polls/", include("rodManager.views.polls.urls")),
     path("api/my-garden/", include("rodManager.views.myGardenPlot.urls")),
-    path("api/garden-info/", include("rodManager.views.gardenInfo.urls")),
+    path("api/garden-info/", include("rodManager.views.RODInfo.urls")),
     path("api/technical-problem/", include("rodManager.views.technicalProblem.urls")),
     path("api/who-am-i/", WhoamiView.as_view(), name="whoami"),
     path("api/payments/", include("rodManager.views.payments.urls")),

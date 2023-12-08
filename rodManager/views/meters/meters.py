@@ -3,6 +3,7 @@
 
 
 
+from tkinter.filedialog import Open
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes, OpenApiResponse
 from rest_framework import status
 from rest_framework.response import Response
@@ -23,6 +24,7 @@ class MetersCRUD(APIView):
     parameters=[
         OpenApiParameter(name="page", type=OpenApiTypes.INT),
         OpenApiParameter(name="page_size", type=OpenApiTypes.INT),
+        OpenApiParameter(name="type", type=OpenApiTypes.STR),
     ],
     responses={
         200: OpenApiResponse(
@@ -34,9 +36,14 @@ class MetersCRUD(APIView):
     )
     def get(self, request):
         paginator = RODPagination()
+        
         if  request.user.is_authenticated:
-            meters = paginator.paginate_queryset(Meter.objects.all().order_by("serial"), request)
-            return paginator.get_paginated_response(MeterSerializer(meters).data)
+            if request.GET["type"]:
+                meters = paginator.paginate_queryset(Meter.objects.filter(type=request.GET["type"]).order_by("serial"), request)
+                return paginator.get_paginated_response(MeterSerializer(meters).data)
+            else:
+                meters = paginator.paginate_queryset(Meter.objects.all().order_by("serial"), request)
+                return paginator.get_paginated_response(MeterSerializer(meters).data)
         else:
             return Response({"error": "You don't have permission to view meters."}, status=status.HTTP_403_FORBIDDEN)
     

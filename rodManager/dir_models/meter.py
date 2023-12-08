@@ -1,6 +1,9 @@
+from attr import fields
 from django.db import models
+from more_itertools import last
 from rest_framework import serializers
 from rodManager.dir_models.garden import GardenSerializer
+from rodManager.dir_models.record import Record
 
 
 class Meter(models.Model):
@@ -16,3 +19,9 @@ class MeterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Meter
         fields = '__all__'
+        
+class MeterLastRecordSerializer(serializers.ModelSerializer):
+    record = serializers.StringRelatedField(many=True)
+    class Meta:
+        model = Meter
+        fields = '__all__'  
