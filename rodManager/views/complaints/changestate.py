@@ -46,7 +46,7 @@ class ChangeState(APIView):
     @permission_required("rodManager.change_complaint")
     def patch(self, request, complaint_id):
         complaints = (
-            Complaint.objects.filter(id=complaint_id, manager=request.user)
+            Complaint.objects.filter(id=complaint_id)
             .annotate(
                 last_update_date=Coalesce(
                     Max("messages__creation_date"), F("open_date")
@@ -56,6 +56,11 @@ class ChangeState(APIView):
         )
         if complaints.exists():
             complaint = complaints.first()
+            if complaint.manager is None:
+                complaint.manager = request.user
+                complaint.save()
+            if complaint.manager != request.user:
+                return Response(status=status.HTTP_403_FORBIDDEN)
             serializer = ChangeStateSerializer(data=request.data)
             if serializer.is_valid():
                 complaint.state = serializer.validated_data["state"]
