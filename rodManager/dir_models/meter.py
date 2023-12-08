@@ -4,7 +4,7 @@ from rodManager.dir_models.garden import GardenSerializer
 
 
 class Meter(models.Model):
-    id = models.AutoField(primary_key=True)
+    serial = models.CharField(max_length=200, primary_key=True)
     type = models.CharField(max_length=200)
     adress = models.CharField(max_length=200)
     garden = models.ForeignKey()
