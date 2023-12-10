@@ -78,22 +78,21 @@ class CurrentFeeView(APIView):
             .order_by("start_date")
             .first()
         )
-        leaseFees = Fee.objects.filter(
-            fee_type="Lease", billing_period=billing_period.id
-        )
-        utilityFees = Fee.objects.filter(
-            fee_type="Utility", billing_period=billing_period.id
-        )
-        additionalFees = Fee.objects.filter(
-            fee_type="Additional", billing_period=billing_period.id
-        )
+        leaseFees = []
+        utilityFees = []
+        additionalFees = []
+        if billing_period:
+            leaseFees = Fee.objects.filter(
+                fee_type="Lease", billing_period=billing_period.id
+            )
+            utilityFees = Fee.objects.filter(
+                fee_type="Utility", billing_period=billing_period.id
+            )
+            additionalFees = Fee.objects.filter(
+                fee_type="Additional", billing_period=billing_period.id
+            )
 
         data = {
-            "billing_period": billing_period.id,
-            "start_date": billing_period.start_date,
-            "end_date": billing_period.end_date,
-            "payment_date": billing_period.payment_date,
-            "is_confirmed": billing_period.is_confirmed,
             "lease_fees": FeeSerializer(leaseFees, many=True).data,
             "utility_fees": FeeSerializer(utilityFees, many=True).data,
             "additional_fees": FeeSerializer(additionalFees, many=True).data,
