@@ -2,8 +2,12 @@ from django.db import models
 
 
 class Payment(models.Model):
-    leaseholderID = models.CharField(max_length=255)
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey("Account", on_delete=models.CASCADE)
+    type = models.CharField(max_length=255)
     date = models.DateField()
     amount = models.FloatField()
     description = models.CharField(max_length=255)
-    required_fields = ["leaseholderID", "date", "amount"]
+    related_fee = models.ForeignKey(
+        "Fee", on_delete=models.CASCADE, null=True, blank=True
+    )

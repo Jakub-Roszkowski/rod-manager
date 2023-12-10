@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+
 from django.db.models import F, Max, Q
 from django.db.models.functions import Coalesce
 from drf_spectacular.utils import (
@@ -24,17 +26,24 @@ class BillingPeriodSerializer(serializers.ModelSerializer):
 class AddBillingPeriodSerializer(serializers.ModelSerializer):
     start_date = serializers.DateField()
     end_date = serializers.DateField()
-    payment_date = serializers.DateField()
+    payment_date = serializers.DateField(allow_null=True, required=False)
 
     class Meta:
         model = BillingPeriod
         fields = ["start_date", "end_date", "payment_date"]
 
     def create(self, validated_data):
+        if validated_data["end_date"] < validated_data["start_date"]:
+            raise serializers.ValidationError(
+                {"error": "End date must be greater than start date."}
+            )
+        payment_date = validated_data.get("payment_date")
+        if payment_date is None:
+            payment_date = validated_data["end_date"] + timedelta(days=31)
         billingperiod = BillingPeriod.objects.create(
             start_date=validated_data["start_date"],
             end_date=validated_data["end_date"],
-            payment_date=validated_data["payment_date"],
+            payment_date=payment_date,
         )
         billingperiod.save()
         return billingperiod
