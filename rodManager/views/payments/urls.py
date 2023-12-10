@@ -1,8 +1,7 @@
 from django.urls import path
 
-import rodManager.views.payments.balance as balance
-import rodManager.views.payments.balancebyid as balancebyid
 import rodManager.views.payments.billingperiod as billingperiod
+import rodManager.views.payments.billpayment as billpayment
 import rodManager.views.payments.confirmbillingperiod as confirmbillingperiod
 import rodManager.views.payments.currentfee as currentfee
 import rodManager.views.payments.editfeebyid as editfeebyid
@@ -34,13 +33,8 @@ urlpatterns = [
         "fee/by-id/<fee_id>/", editfeebyid.EditFeeByIdView.as_view(), name="editFeeById"
     ),
     path("payment/", payment.PaymentView.as_view(), name="payment"),
+    path("bill-payment/", billpayment.BillPaymentView.as_view(), name="bill payment"),
     path(
         "payment/<user_id>/", paymentbyid.PaymentByIdView.as_view(), name="paymentById"
-    ),
-    path("balance/", balance.BalanceView.as_view(), name="balance"),
-    path(
-        "balance/<user_id>/",
-        balancebyid.BalanceByIdView.as_view(),
-        name="balanceById",
     ),
 ]
