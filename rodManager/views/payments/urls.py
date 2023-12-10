@@ -2,6 +2,7 @@ from django.urls import path
 
 import rodManager.views.payments.billingperiod as billingperiod
 import rodManager.views.payments.confirmbillingperiod as confirmbillingperiod
+import rodManager.views.payments.currentfee as currentfee
 import rodManager.views.payments.editfeebyid as editfeebyid
 import rodManager.views.payments.edits as edits
 import rodManager.views.payments.fee as fee
@@ -21,6 +22,7 @@ urlpatterns = [
         name="confirmbillingperiod",
     ),
     path("fee/", fee.FeeView.as_view(), name="fee"),
+    path("fee/current/", currentfee.CurrentFeeView.as_view(), name="current fee"),
     path(
         "fee/by-billing-period/<billing_period_id>/",
         feebyid.FeeByIdView.as_view(),
