@@ -48,6 +48,7 @@ class AccountByIdView(APIView):
                             "type": "array",
                             "items": {"type": "string"},
                         },
+                        "balance": {"type": "number"},
                     },
                 },
             ),
@@ -71,6 +72,7 @@ class AccountByIdView(APIView):
                 "email": account.email,
                 "phone": account.phone,
                 "groups": [group.name for group in account.groups.all()],
+                "balance": account.calculate_balance(),
             }
 
             if (
