@@ -55,7 +55,7 @@ class PaymentSerializer(serializers.ModelSerializer):
         fields = ["id", "user", "type", "date", "amount", "description", "related_fee"]
 
 
-class PaymenttView(APIView):
+class PaymentView(APIView):
     @extend_schema(
         summary="Add user payments",
         description="Add user payments in the system.",
