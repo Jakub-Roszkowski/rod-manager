@@ -6,4 +6,4 @@ class BillingPeriod(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     payment_date = models.DateField()
-    is_closed = models.BooleanField(default=False)
+    is_confirmed = models.BooleanField(default=False)
