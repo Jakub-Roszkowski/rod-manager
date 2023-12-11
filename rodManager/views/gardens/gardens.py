@@ -122,7 +122,10 @@ class GardensCRUD(APIView):
             garden.area = request.data["area"]
         if request.data.get("leaseholderID"):
             garden.last_leaseholder = garden.leaseholderID
-            garden.leaseholderID = Account.objects.get(id = request.data["leaseholderID"])
+            if request.data["leaseholderID"] == "None":
+                garden.leaseholderID = None
+            else:
+                garden.leaseholderID = Account.objects.get(id = request.data["leaseholderID"])
         if request.data.get("status"):
             garden.status = request.data["status"]
         garden.save()
