@@ -73,7 +73,6 @@ class ComplaintSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
     manager = serializers.SerializerMethodField()
     messages = MessageSerializer(many=True, read_only=True)
-    readed = serializers.SerializerMethodField()
 
     class Meta:
         model = Complaint
