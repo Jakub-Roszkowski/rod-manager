@@ -20,6 +20,8 @@ class AddMessageSerializer(serializers.Serializer):
         complaint = validated_data["complaint"]
         if complaint.user == validated_data["user"]:
             author = MessageAuthor.USER
+            complaint.un_read_user = MessageAuthor.MANAGER
+            complaint.save()
         else:
             if (
                 validated_data["user"].groups.filter(name="MANAGER").exists()
@@ -29,6 +31,7 @@ class AddMessageSerializer(serializers.Serializer):
                 or validated_data["user"].groups.filter(name="ADMIN").exists()
             ):
                 author = MessageAuthor.MANAGER
+                complaint.un_read_user = MessageAuthor.USER
             else:
                 raise serializers.ValidationError(
                     {"error": "Wrong user - not your conversation"}, status=400
@@ -36,6 +39,8 @@ class AddMessageSerializer(serializers.Serializer):
         message = Message.objects.create(
             content=validated_data["content"], complaint=complaint, author=author
         )
+        complaint.save()
+
         return message
 
 

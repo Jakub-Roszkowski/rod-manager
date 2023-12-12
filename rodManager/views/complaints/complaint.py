@@ -89,7 +89,9 @@ class ComplaintView(APIView):
             )
         if state is not None:
             complaints = complaints.filter(state=state)
-        serializer = ComplainsWithoutMassagesSerializer(complaints, many=True)
+        serializer = ComplainsWithoutMassagesSerializer(
+            complaints, many=True, context={"request": request}
+        )
         paginator = RODPagination()
         page = paginator.paginate_queryset(serializer.data, request)
         return paginator.get_paginated_response(page)
