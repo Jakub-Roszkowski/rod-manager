@@ -63,8 +63,8 @@ class PaymentSerializer(serializers.ModelSerializer):
 
 class BillPaymentView(APIView):
     @extend_schema(
-        summary="Add user payments",
-        description="Add user payments in the system.",
+        summary="Add user bill payments",
+        description="Add user bill payments in the system.",
         request=AddBillPaymentSerializer,
         responses=PaymentSerializer(),
     )

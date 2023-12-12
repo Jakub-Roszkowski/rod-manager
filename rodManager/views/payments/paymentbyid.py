@@ -50,8 +50,8 @@ class PaymentSerializer(serializers.ModelSerializer):
 
 class PaymentByIdView(APIView):
     @extend_schema(
-        summary="Add fee",
-        description="Add fee in the system.",
+        summary="Get fee",
+        description="Get fee in the system.",
         responses=PaymentSerializer(),
     )
     @permission_required()
