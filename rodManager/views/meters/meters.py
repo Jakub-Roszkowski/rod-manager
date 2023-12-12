@@ -39,11 +39,18 @@ class MetersCRUD(APIView):
         
         if  request.user.is_authenticated:
             if request.GET["type"]:
-                meters = paginator.paginate_queryset(Meter.objects.filter(type=request.GET["type"]).order_by("serial"), request)
-                return paginator.get_paginated_response(MeterSerializer(meters).data)
+                no_garden_meters = Meter.objects.filter(type=request.GET["type"], garden = None).order_by("address")
+                meters = Meter.objects.filter(type=request.GET["type"]).exclude(garden = None).order_by("address")
+                meters = paginator.paginate_queryset(meters, request)
+                no_garden_meters = paginator.paginate_queryset(no_garden_meters, request)
+                return paginator.get_paginated_response(MeterSerializer(meters).data + MeterSerializer(no_garden_meters).data)
             else:
-                meters = paginator.paginate_queryset(Meter.objects.all().order_by("serial"), request)
-                return paginator.get_paginated_response(MeterSerializer(meters).data)
+                no_garden_meters = Meter.objects.filter( garden = None).order_by("address")
+                meters = Meter.objects.filter().exclude(garden = None).order_by("address")
+                meters = paginator.paginate_queryset(meters, request)
+                no_garden_meters = paginator.paginate_queryset(no_garden_meters, request)
+                return paginator.get_paginated_response(MeterSerializer(meters).data + MeterSerializer(no_garden_meters).data)
+            
         else:
             return Response({"error": "You don't have permission to view meters."}, status=status.HTTP_403_FORBIDDEN)
     
@@ -149,3 +156,4 @@ class MetersCRUD(APIView):
         else:
             return Response({"error": "You don't have permission to delete meters."}, status=status.HTTP_403_FORBIDDEN)
         
+
