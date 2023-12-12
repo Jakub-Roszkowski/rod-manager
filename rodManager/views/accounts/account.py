@@ -67,7 +67,7 @@ class AccountView(APIView):
     )
     @permission_required("rodManager.view_account")
     def get(self, request):
-        accounts = Account.objects.all()
+        accounts = Account.objects.all().order_by('last_name', 'first_name', 'email')
         if request.query_params.get("payment_arrears") == "true":
             accounts = [
                 account for account in accounts if account.calculate_balance() < 0
