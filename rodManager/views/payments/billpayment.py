@@ -33,13 +33,24 @@ class AddBillPaymentSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        payment = Payment.objects.create(
-            user=validated_data["user"],
-            type="BillPayment",
-            date=django.utils.timezone.now().date(),
-            amount=validated_data["amount"],
-            description="Płatność u zarządcy",
-        )
+        if validated_data["amount"] == 0:
+            raise serializers.ValidationError("Amount cannot be 0")
+        if validated_data["amount"] < 0:
+            payment = Payment.objects.create(
+                user=validated_data["user"],
+                type="Correction",
+                date=django.utils.timezone.now().date(),
+                amount=validated_data["amount"],
+                description="Korekta rachunku",
+            )
+        else:
+            payment = Payment.objects.create(
+                user=validated_data["user"],
+                type="BillPayment",
+                date=django.utils.timezone.now().date(),
+                amount=validated_data["amount"],
+                description="Płatność u zarządcy",
+            )
         payment.save()
         return payment
 
