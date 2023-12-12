@@ -70,7 +70,8 @@ urlpatterns = [
     path("api/rod-documents/", include("rodManager.views.roddocuments.urls")),
     path("api/complaints/", include("rodManager.views.complaints.urls")),
     path("api/notifications/", include("rodManager.views.notifications.urls")),
-    path("api/gardeneirs/", include("rodManager.views.gardeneirs.urls")),
+    path("api/gardeners/", include("rodManager.views.gardeners.urls")),
+    path("api/meters/", include("rodManager.views.meters.urls")),
 ]
 
 if settings.DEBUG:

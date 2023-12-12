@@ -3,7 +3,8 @@
 
 
 
-from tkinter.filedialog import Open
+
+from itertools import chain
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes, OpenApiResponse
 from rest_framework import status
 from rest_framework.response import Response
@@ -38,18 +39,18 @@ class MetersCRUD(APIView):
         paginator = RODPagination()
         
         if  request.user.is_authenticated:
-            if request.GET["type"]:
-                no_garden_meters = Meter.objects.filter(type=request.GET["type"], garden = None).order_by("address")
-                meters = Meter.objects.filter(type=request.GET["type"]).exclude(garden = None).order_by("address")
+            if request.GET.get("type"):
+                no_garden_meters = Meter.objects.filter(type=request.GET["type"], garden = None).order_by("adress")
+                meters = Meter.objects.filter(type=request.GET["type"]).exclude(garden = None).order_by("adress")
                 meters = paginator.paginate_queryset(meters, request)
                 no_garden_meters = paginator.paginate_queryset(no_garden_meters, request)
-                return paginator.get_paginated_response(MeterSerializer(meters).data + MeterSerializer(no_garden_meters).data)
+                return paginator.get_paginated_response(list(chain(MeterSerializer(meters,many=True).data, MeterSerializer(no_garden_meters,many=True).data)))
             else:
-                no_garden_meters = Meter.objects.filter( garden = None).order_by("address")
-                meters = Meter.objects.filter().exclude(garden = None).order_by("address")
+                no_garden_meters = Meter.objects.filter( garden = None).order_by("adress")
+                meters = Meter.objects.filter().exclude(garden = None).order_by("adress")
                 meters = paginator.paginate_queryset(meters, request)
                 no_garden_meters = paginator.paginate_queryset(no_garden_meters, request)
-                return paginator.get_paginated_response(MeterSerializer(meters).data + MeterSerializer(no_garden_meters).data)
+                return paginator.get_paginated_response(list(chain(MeterSerializer(meters,many=True).data, MeterSerializer(no_garden_meters,many=True).data)))
             
         else:
             return Response({"error": "You don't have permission to view meters."}, status=status.HTTP_403_FORBIDDEN)
