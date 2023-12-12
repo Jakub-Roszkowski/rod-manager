@@ -6,7 +6,7 @@ import rodManager.views.RODInfo.RODDescription as garden_info_description
 
 
 urlpatterns = [
-    path("", garden_info.RODInfoApi.as_view(), name="GardenInfo"),
-    path("description/", garden_info_description.RODInfoDescriptionApi.as_view(), name="GardenInfoDescription"),
-    path("<int:employer_id>/", garden_info.GardenInfoApiWithID.as_view(), name="GardenInfo"),
+    path("", garden_info.RODInfoApi.as_view(), name="RODInfo"),
+    path("description/", garden_info_description.RODInfoDescriptionApi.as_view(), name="RODInfoDescription"),
+    path("<int:employer_id>/", garden_info.GardenInfoApiWithID.as_view(), name="RODInfo"),
 ]

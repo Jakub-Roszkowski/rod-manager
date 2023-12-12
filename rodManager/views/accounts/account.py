@@ -28,6 +28,12 @@ class AccountView(APIView):
                 location=OpenApiParameter.QUERY,
                 description="Page size.",
             ),
+            OpenApiParameter(
+                name="payment_arrears",
+                type=OpenApiTypes.BOOL,
+                location=OpenApiParameter.QUERY,
+                description="If true, only return accounts with payment arrears.",
+            ),
         ],
         responses={
             200: OpenApiResponse(
@@ -50,6 +56,7 @@ class AccountView(APIView):
                                         "type": "array",
                                         "items": {"type": "string"},
                                     },
+                                    "balance": {"type": "number"},
                                 },
                             },
                         },
@@ -61,6 +68,10 @@ class AccountView(APIView):
     @permission_required("rodManager.view_account")
     def get(self, request):
         accounts = Account.objects.all()
+        if request.query_params.get("payment_arrears") == "true":
+            accounts = [
+                account for account in accounts if account.calculate_balance() < 0
+            ]
 
         paginator = RODPagination()
         paginated_accounts = paginator.paginate_queryset(accounts, request)
@@ -73,6 +84,7 @@ class AccountView(APIView):
                 "email": accounts.email,
                 "phone": accounts.phone,
                 "groups": [group.name for group in accounts.groups.all()],
+                "balance": accounts.calculate_balance(),
             }
             for accounts in paginated_accounts
         ]

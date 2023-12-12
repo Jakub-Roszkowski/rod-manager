@@ -8,8 +8,6 @@ from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-import rodManager.views.payments.paymentsData as paymentsData
-
 
 class FeeSerializer(serializers.Serializer):
     feeID = serializers.IntegerField()

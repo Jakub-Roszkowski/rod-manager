@@ -67,6 +67,7 @@ urlpatterns = [
     path("api/payments/", include("rodManager.views.payments.urls")),
     path("api/manager-documents/", include("rodManager.views.managerdocuments.urls")),
     path("api/complaints/", include("rodManager.views.complaints.urls")),
+    path("api/notifications/", include("rodManager.views.notifications.urls")),
 ]
 
 if settings.DEBUG:

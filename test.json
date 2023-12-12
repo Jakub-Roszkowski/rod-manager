@@ -1,0 +1,62 @@
+{
+    "billingperiod": 1,
+    "start_date": "2019-01-01",
+    "end_date": "2019-12-31",
+    "payment_date": "2019-12-31",
+    "is_closed": true,
+    "leaseFees": [
+        {
+            "id": 1,
+            "name": "PZD",
+            "type": "Za metr",
+            "value": 0.12,
+            "calculated_value": 1200
+        },
+        {
+            "id": 2,
+            "name": "Opłata ogrodowa",
+            "type": "Za metr",
+            "value": 0.61,
+            "calculated_value": 6100
+        },
+        {
+            "id": 3,
+            "name": "Opłata Inwestycyjna",
+            "type": "Za metr",
+            "value": 0.5,
+            "calculated_value": 5000
+        }
+    ],
+    "utilityFees": [
+        {
+            "id": 4,
+            "name": "Prąd",
+            "type": "Za metr",
+            "value": 0.12,
+            "calculated_value": 1200
+        },
+        {
+            "id": 5,
+            "name": "Woda",
+            "type": "Za metr",
+            "value": 0.61,
+            "calculated_value": 6100
+        }
+    ],
+    "additionalFees": [
+        {
+            "id": 6,
+            "name": "Koszenie trawy",
+            "type": "Za działke",
+            "value": 70,
+            "calculated_value": 7000
+        },
+        {
+            "id": 7,
+            "name": "Grabienie liści",
+            "type": "Za działke",
+            "value": 40,
+            "calculated_value": 4000
+        }
+    ],
+}
