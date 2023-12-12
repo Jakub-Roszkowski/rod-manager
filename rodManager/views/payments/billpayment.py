@@ -21,7 +21,7 @@ from rodManager.libs.rodpagitation import RODPagination
 from rodManager.users.validate import permission_required
 
 
-class AddPaymentSerializer(serializers.ModelSerializer):
+class AddBillPaymentSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=Account.objects.all())
     amount = serializers.FloatField(required=True)
 
@@ -54,12 +54,12 @@ class BillPaymentView(APIView):
     @extend_schema(
         summary="Add user payments",
         description="Add user payments in the system.",
-        request=AddPaymentSerializer,
+        request=AddBillPaymentSerializer,
         responses=PaymentSerializer(),
     )
     @permission_required()
     def post(self, request):
-        serializer = AddPaymentSerializer(data=request.data)
+        serializer = AddBillPaymentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             response = PaymentSerializer(serializer.instance)
