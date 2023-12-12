@@ -73,6 +73,7 @@ class ComplaintSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
     manager = serializers.SerializerMethodField()
     messages = MessageSerializer(many=True, read_only=True)
+    readed = serializers.SerializerMethodField()
 
     class Meta:
         model = Complaint
@@ -101,6 +102,7 @@ class ComplaintSerializer(serializers.ModelSerializer):
 class ComplainsWithoutMassagesSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
     manager = serializers.SerializerMethodField()
+    readed = serializers.SerializerMethodField()
 
     class Meta:
         model = Complaint
@@ -113,6 +115,7 @@ class ComplainsWithoutMassagesSerializer(serializers.ModelSerializer):
             "state",
             "user",
             "manager",
+            "readed",
         ]
 
     def get_user(self, obj):
@@ -123,3 +126,15 @@ class ComplainsWithoutMassagesSerializer(serializers.ModelSerializer):
             return obj.manager.email
         else:
             return None
+
+    def get_readed(self, obj):
+        if self.context["request"].user == obj.user:
+            if obj.un_read_user == MessageAuthor.USER:
+                return False
+            else:
+                return True
+        else:
+            if obj.un_read_user == MessageAuthor.MANAGER:
+                return False
+            else:
+                return True
