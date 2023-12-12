@@ -31,6 +31,12 @@ class Complaint(models.Model):
         Account, related_name="complaints", on_delete=models.CASCADE
     )
     manager = models.ForeignKey(Account, on_delete=models.CASCADE, null=True)
+    un_read_user = models.CharField(
+        max_length=20,
+        choices=MessageAuthor.choices,
+        default=MessageAuthor.MANAGER,
+        null=True,
+    )
 
     def last_update_date(self):
         if self.messages.all().last().creation_date:
