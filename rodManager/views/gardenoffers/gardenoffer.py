@@ -265,12 +265,13 @@ class GardenOfferView(APIView):
                         {"error": "Garden does not exist."},
                         status=status.HTTP_400_BAD_REQUEST,
                     )
-                print(garden.first().status)
-                if garden.first().status != "dostepna":
-                    return Response(
-                        {"error": "Garden is not available."},
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
+                # TODO wywala błąd bez sensu
+                # print(garden.first().status)
+                # if garden.first().status != "dostępna":
+                #     return Response(
+                #         {"error": "Garden is not available."},
+                #         status=status.HTTP_400_BAD_REQUEST,
+                #     )
                 if GardenOffers.objects.filter(garden=garden.first()).exists():
                     return Response(
                         {"error": "Garden already has an offer."},
