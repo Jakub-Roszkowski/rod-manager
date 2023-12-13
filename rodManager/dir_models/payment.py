@@ -3,10 +3,21 @@ from django.db import models
 from rodManager.dir_models.account import Account
 
 
+class PaymentType(models.TextChoices):
+    BILLPAYMENT = "BillPayment"
+    CORRECTION = "Correction"
+    PAYMENT = "Payment"
+    INDIVIDUAL = "Individual"
+
+
 class Payment(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey("Account", on_delete=models.CASCADE)
-    type = models.CharField(max_length=255)
+    type = models.CharField(
+        max_length=20,
+        choices=PaymentType.choices,
+        default=PaymentType.PAYMENT,
+    )
     date = models.DateField()
     amount = models.FloatField()
     description = models.CharField(max_length=255)

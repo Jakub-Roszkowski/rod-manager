@@ -16,7 +16,7 @@ from rest_framework.views import APIView
 from rodManager.dir_models.account import Account
 from rodManager.dir_models.billingperiod import BillingPeriod
 from rodManager.dir_models.fee import Fee
-from rodManager.dir_models.payment import Payment
+from rodManager.dir_models.payment import Payment, PaymentType
 from rodManager.libs.rodpagitation import RODPagination
 from rodManager.users.validate import permission_required
 
@@ -33,24 +33,15 @@ class AddBillPaymentSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        if validated_data["amount"] == 0:
-            raise serializers.ValidationError("Amount cannot be 0")
-        if validated_data["amount"] < 0:
-            payment = Payment.objects.create(
-                user=validated_data["user"],
-                type="Correction",
-                date=django.utils.timezone.now().date(),
-                amount=validated_data["amount"],
-                description="Korekta rachunku",
-            )
-        else:
-            payment = Payment.objects.create(
-                user=validated_data["user"],
-                type="BillPayment",
-                date=django.utils.timezone.now().date(),
-                amount=validated_data["amount"],
-                description="Płatność u zarządcy",
-            )
+        if validated_data["amount"] <= 0:
+            raise serializers.ValidationError("Amount must be greater than 0.")
+        payment = Payment.objects.create(
+            user=validated_data["user"],
+            type=PaymentType.BILLPAYMENT,
+            date=django.utils.timezone.now().date(),
+            amount=validated_data["amount"],
+            description="Płatność u zarządcy",
+        )
         payment.save()
         return payment
 
