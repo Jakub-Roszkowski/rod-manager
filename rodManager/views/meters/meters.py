@@ -9,14 +9,16 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes,
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rodManager.libs.rodpagitation import RODPagination
-from rodManager.dir_models.meter import Meter, MeterSerializer
+from rodManager.libs.rodpagitation import RODPagination 
+from rodManager.dir_models.meter import Meter, MeterLastRecordSerializer
+from rodManager.dir_models.record import Record, RecordSerializer
+import datetime
 
 
 class MetersCRUD(APIView):
 
     queryset = Meter.objects.all()
-    serializer_class = MeterSerializer
+    serializer_class = MeterLastRecordSerializer
     pagination_class = RODPagination
 
     @extend_schema(
@@ -30,7 +32,7 @@ class MetersCRUD(APIView):
     responses={
         200: OpenApiResponse(
             description="Meter list.",
-            response=MeterSerializer(many=True),
+            response=MeterLastRecordSerializer(many=True),
         ),
     }
     
@@ -44,20 +46,20 @@ class MetersCRUD(APIView):
                 meters = Meter.objects.filter(type=request.GET["type"]).exclude(garden = None).order_by("adress")
                 meters = paginator.paginate_queryset(meters, request)
                 no_garden_meters = paginator.paginate_queryset(no_garden_meters, request)
-                return paginator.get_paginated_response(list(chain(MeterSerializer(meters,many=True).data, MeterSerializer(no_garden_meters,many=True).data)))
+                return paginator.get_paginated_response(list(chain(MeterLastRecordSerializer(meters,many=True).data, MeterLastRecordSerializer(no_garden_meters,many=True).data)))
             else:
                 no_garden_meters = Meter.objects.filter( garden = None).order_by("adress")
                 meters = Meter.objects.filter().exclude(garden = None).order_by("adress")
                 meters = paginator.paginate_queryset(meters, request)
                 no_garden_meters = paginator.paginate_queryset(no_garden_meters, request)
-                return paginator.get_paginated_response(list(chain(MeterSerializer(meters,many=True).data, MeterSerializer(no_garden_meters,many=True).data)))
+                return paginator.get_paginated_response(list(chain(MeterLastRecordSerializer(meters,many=True).data, MeterLastRecordSerializer(no_garden_meters,many=True).data)))
             
         else:
             return Response({"error": "You don't have permission to view meters."}, status=status.HTTP_403_FORBIDDEN)
     
     @extend_schema(
     summary="Create meter",
-    request=MeterSerializer,
+    request=MeterLastRecordSerializer,
     responses={
         201: OpenApiResponse(
             description="Meter created."
@@ -80,55 +82,25 @@ class MetersCRUD(APIView):
             
             newmeter = Meter.objects.create(
                 serial=request.data["serial"],
-                status=request.data["type"],
+                type=request.data["type"],
             )
             if request.data.get("adress"):
                 newmeter.adress = request.data["adress"]
             if request.data.get("garden"):
                 newmeter.garden = request.data["garden"]
-            if request.data.get("status"):
-                newmeter.status = request.data["status"]
+            if request.data.get("value"):
+                Record.objects.create(
+                    meter=newmeter,
+                    value=request.data["value"],
+                    date = datetime.date.today(),
+                    time = datetime.datetime.now().time()
+                )
             newmeter.save()
             return Response({"message": "Meter created."}, status=status.HTTP_201_CREATED)
         else:
             return Response({"error": "You don't have permission to create meters."}, status=status.HTTP_403_FORBIDDEN)
     
-    @extend_schema(
-    summary="Update meter",
-    request=MeterSerializer,
-    responses={
-        200: OpenApiResponse(
-            description="Meter updated."
-        ),
-        400: OpenApiResponse(
-            description="Bad request."
-        ),
-        403: OpenApiResponse(
-            description="Forbidden."
-        ),
-    }
-    )
-    def patch(self, request):
-        if request.user.is_authenticated:
-            try:
-                meter = Meter.objects.get(serial = request.data["serial"])
-            except Meter.DoesNotExist:
-                return Response({"error": "Meter does not exist."}, status=status.HTTP_400_BAD_REQUEST)
-            
-            if request.data.get("type"):
-                meter.type = request.data["type"]
-            if request.data.get("status"):
-                meter.status = request.data["status"]
-            if request.data.get("adress"):
-                meter.adress = request.data["adress"]
-            if request.data.get("garden"):
-                meter.garden = request.data["garden"]
-            
-            meter.save()
-            return Response({"message": "Meter updated."}, status=status.HTTP_200_OK)
-        else:
-            return Response({"error": "You don't have permission to update meters."}, status=status.HTTP_403_FORBIDDEN)
-        
+    
     @extend_schema(
     summary="Delete meter",
     parameters=[

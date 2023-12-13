@@ -24,7 +24,10 @@ class MeterSerializer(serializers.ModelSerializer):
 
 
 class MeterLastRecordSerializer(serializers.ModelSerializer):
-    record = serializers.StringRelatedField(many=True)
+    value = serializers.SerializerMethodField()
+
+    def get_value(self, obj):
+        return Record.objects.filter(meter=obj).order_by("-date", "-time")[0].value
 
     class Meta:
         model = Meter

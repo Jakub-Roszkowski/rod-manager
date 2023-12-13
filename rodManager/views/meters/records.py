@@ -1,6 +1,6 @@
 
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from rodManager.dir_models.record import Record, RecordSerializer
+from rodManager.dir_models.record import Record, RecordSerializer, RecordsValuesSerializer
 from rodManager.libs.rodpagitation import RODPagination
 from rest_framework import status
 from rest_framework.response import Response
@@ -39,7 +39,7 @@ class RecordsCRUD(APIView):
 
     @extend_schema(
     summary="Create record",
-    request=RecordSerializer,
+    request=RecordsValuesSerializer,
     responses={
         200: OpenApiResponse(
             description="Record created.",
