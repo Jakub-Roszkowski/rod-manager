@@ -16,7 +16,7 @@ class VotedPolls(APIView):
     def get(self, request):
         polls = Poll.objects.filter(
             end_date__gte=datetime.now(), options__votes__user=request.user
-        )
+        ).order_by("-end_date")
 
         serializer = PollSerializer(polls, many=True, context={"request": request})
         return Response(serializer.data)

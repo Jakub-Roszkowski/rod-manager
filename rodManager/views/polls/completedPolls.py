@@ -14,6 +14,6 @@ class CompletedPolls(APIView):
         responses={200: PollSerializer(many=True)},
     )
     def get(self, request):
-        polls = Poll.objects.filter(end_date__lt=datetime.now())
+        polls = Poll.objects.filter(end_date__lt=datetime.now()).order_by("-end_date")
         serializer = PollSerializer(polls, many=True, context={"request": request})
         return Response(serializer.data)
