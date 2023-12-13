@@ -33,7 +33,7 @@ class TechnicalProblem(APIView):
                 send_mail_from_template(
                     "technical_problem",
                     "Problem techniczny",
-                    ["tomik12124@gmail.com", "tomek@plociennik.info"],
+                    ["tomik12124@gmail.com", "tomek@plociennik.info", "roszkolgaming@gmail.com"],
                     data,
                 )
                 == "error"

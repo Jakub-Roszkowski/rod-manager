@@ -77,6 +77,7 @@ class GardensCRUD(APIView):
                 avenue=request.data["avenue"],
                 number=request.data["number"],
                 area=request.data["area"],
+                status=request.data["status"],
                 
             )
             if request.data.get("leaseholderID"):
