@@ -44,16 +44,35 @@ class MetersCRUD(APIView):
         if  request.user.is_authenticated:
             if request.GET.get("type"):
                 no_garden_meters = Meter.objects.filter(type=request.GET["type"], garden = None).order_by("adress")
-                meters = Meter.objects.filter(type=request.GET["type"]).exclude(garden = None).order_by("adress")
-                meters = paginator.paginate_queryset(meters, request)
-                no_garden_meters = paginator.paginate_queryset(no_garden_meters, request)
-                return paginator.get_paginated_response(list(chain(MeterLastRecordSerializer(meters,many=True).data, MeterLastRecordSerializer(no_garden_meters,many=True).data)))
+                otherMeters = Meter.objects.filter(type=request.GET["type"]).order_by("adress")
+
+                # Połączenie i usunięcie powtórzeń z zachowaniem kolejności
+                unique_combined_list = []
+                seen = set()
+                for meter in chain( no_garden_meters,otherMeters):
+                    if meter not in seen:
+                        unique_combined_list.append(meter)
+                        seen.add(meter)
+
+                paginated_accounts = paginator.paginate_queryset(unique_combined_list, request)
+
+                return paginator.get_paginated_response(MeterLastRecordSerializer(paginated_accounts,many=True).data)
             else:
-                no_garden_meters = Meter.objects.filter( garden = None).order_by("adress")
-                meters = Meter.objects.filter().exclude(garden = None).order_by("adress")
-                meters = paginator.paginate_queryset(meters, request)
-                no_garden_meters = paginator.paginate_queryset(no_garden_meters, request)
-                return paginator.get_paginated_response(list(chain(MeterLastRecordSerializer(meters,many=True).data, MeterLastRecordSerializer(no_garden_meters,many=True).data)))
+
+                no_garden_meters = Meter.objects.filter(garden = None).order_by("adress")
+                otherMeters = Meter.objects.all().order_by("adress")
+
+                # Połączenie i usunięcie powtórzeń z zachowaniem kolejności
+                unique_combined_list = []
+                seen = set()
+                for meter in chain( no_garden_meters,otherMeters):
+                    if meter not in seen:
+                        unique_combined_list.append(meter)
+                        seen.add(meter)
+
+                paginated_accounts = paginator.paginate_queryset(unique_combined_list, request)
+
+                return paginator.get_paginated_response(MeterLastRecordSerializer(paginated_accounts,many=True).data)
             
         else:
             return Response({"error": "You don't have permission to view meters."}, status=status.HTTP_403_FORBIDDEN)
