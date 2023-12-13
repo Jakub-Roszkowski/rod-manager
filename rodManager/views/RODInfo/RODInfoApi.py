@@ -4,6 +4,9 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from rodManager.libs.rodpagitation import RODPagination
+from rodManager.dir_models.employee import Employee
+
 employers = [
     {
         'id': 1,
@@ -31,11 +34,11 @@ employers = [
 class RODInfoApi(APIView):
 
     @swagger_auto_schema(
-        operation_summary="Get all employers",
-        operation_description="Returns a list of all employers.",
+        operation_summary="Get all employees",
+        operation_description="Returns a list of all employees.",
         responses={
             200: openapi.Response(
-                description="List of all employers",
+                description="List of all employees",
                 schema=openapi.Schema(
                     type=openapi.TYPE_ARRAY,
                     items=openapi.Schema(
@@ -53,10 +56,15 @@ class RODInfoApi(APIView):
         },
     )
     def get(self, request):
-        return Response(employers)
+        pagination_class = RODPagination
+        paginator = RODPagination()
+
+        employers = paginator.paginate_queryset(Employee.objects.all, request)
+        return paginator.get_paginated_response(employers)
+        
 
     @swagger_auto_schema(
-        operation_summary="Add a new employer",
+        operation_summary="Add a new employee",
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={

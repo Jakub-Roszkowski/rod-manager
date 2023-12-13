@@ -51,10 +51,8 @@ class RecordsCRUD(APIView):
         if  request.user.is_authenticated:
             if request.data["value"] < 0:
                 return Response({"error": "Value must be positive."}, status=status.HTTP_400_BAD_REQUEST)   
-            if not request.data["date"]:
-                request.data["date"] = datetime.date.today()
-            if not request.data["time"]:
-                request.data["time"] = datetime.datetime.now().time()
+            if not request.data["datetime"]:
+                request.data["datetime"] = datetime.datetime.now()
             serializer = RecordSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save()
