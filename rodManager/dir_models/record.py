@@ -12,9 +12,10 @@ class RecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = Record
         fields = "__all__"
+        
 
 class RecordsValuesSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = Record
         fields = ["value"]

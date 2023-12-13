@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes, OpenApiResponse
-
+import datetime
 
 class RecordsCRUD(APIView):
     """
@@ -49,6 +49,12 @@ class RecordsCRUD(APIView):
     )
     def post(self, request):
         if  request.user.is_authenticated:
+            if request.data["value"] < 0:
+                return Response({"error": "Value must be positive."}, status=status.HTTP_400_BAD_REQUEST)   
+            if not request.data["date"]:
+                request.data["date"] = datetime.date.today()
+            if not request.data["time"]:
+                request.data["time"] = datetime.datetime.now().time()
             serializer = RecordSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save()
