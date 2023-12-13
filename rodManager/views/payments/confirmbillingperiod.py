@@ -55,7 +55,7 @@ class ConfirmBillingPeriodView(APIView):
                 )
         if billingperiod.payment_date <= date.today():
             return Response(
-                {"error": "Payment date is in the past."},
+                {"error": "Payment date must be in the future."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
