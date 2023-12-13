@@ -37,6 +37,25 @@ class AddBillingPeriodSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {"error": "End date must be greater than start date."}
             )
+        billingperiods = BillingPeriod.objects.all().order_by("-start_date")
+        if billingperiods.exists():
+            last_billing_period = billingperiods.first()
+            if last_billing_period.end_date != validated_data[
+                "start_date"
+            ] and last_billing_period.end_date != validated_data[
+                "start_date"
+            ] - timedelta(
+                days=1
+            ):
+                raise serializers.ValidationError(
+                    {
+                        "error": "New billing period can be created only at end of existing billing period."
+                    }
+                )
+        if validated_data.get("payment_date") < validated_data["end_date"]:
+            raise serializers.ValidationError(
+                {"error": "Payment date must be greater than end date."}
+            )
         payment_date = validated_data.get("payment_date")
         if payment_date is None:
             payment_date = validated_data["end_date"] + timedelta(days=31)

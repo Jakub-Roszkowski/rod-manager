@@ -22,25 +22,6 @@ class BillingPeriodSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class AddBillingPeriodSerializer(serializers.ModelSerializer):
-    start_date = serializers.DateField()
-    end_date = serializers.DateField()
-    payment_date = serializers.DateField()
-
-    class Meta:
-        model = BillingPeriod
-        fields = ["start_date", "end_date", "payment_date"]
-
-    def create(self, validated_data):
-        billingperiod = BillingPeriod.objects.create(
-            start_date=validated_data["start_date"],
-            end_date=validated_data["end_date"],
-            payment_date=validated_data["payment_date"],
-        )
-        billingperiod.save()
-        return billingperiod
-
-
 class ConfirmBillingPeriodView(APIView):
     @extend_schema(
         summary="Confirm billing period",
@@ -60,6 +41,12 @@ class ConfirmBillingPeriodView(APIView):
                 {"error": "Billing period is already confirmed."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        if billingperiod.payment_date <= date.today():
+            return Response(
+                {"error": "Payment date is in the past."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         # TUTAJ DZIEJE SIĘ CAŁA MAGIA DOPISYWANIA UŻYTKOWNIKOM OPŁAT NA STANY KONT
         billingperiod.is_confirmed = True
         billingperiod.save()
