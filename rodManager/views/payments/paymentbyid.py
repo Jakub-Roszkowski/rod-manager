@@ -49,9 +49,15 @@ class PaymentSerializer(serializers.ModelSerializer):
 
 
 class PaymentByIdView(APIView):
+    pagination_class = RODPagination
+
     @extend_schema(
         summary="Get fee",
         description="Get fee in the system.",
+        parameters=[
+            OpenApiParameter(name="page", type=OpenApiTypes.INT),
+            OpenApiParameter(name="page_size", type=OpenApiTypes.INT),
+        ],
         responses=PaymentSerializer(),
     )
     @permission_required()
@@ -61,6 +67,8 @@ class PaymentByIdView(APIView):
                 {"error": "user_id is required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        payments = Payment.objects.filter(user=user_id)
+        payments = Payment.objects.filter(user=user_id).order_by("-date")
         serializer = PaymentSerializer(payments, many=True)
-        return Response(serializer.data)
+        paginator = RODPagination()
+        page = paginator.paginate_queryset(serializer.data, request)
+        return paginator.get_paginated_response(page)
