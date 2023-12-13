@@ -71,7 +71,9 @@ class PaswordResetRequestView(APIView):
         send_mail_from_template(
             "password_reset",
             "Reset hasła",
-            ["tomek@plociennik.info"],
+            [
+                "tomek@plociennik.info"
+            ],  # TODO zmienić maila na user.email, ale aktualnie maile to np. admin@admin.admin więc nie działa
             {
                 "link": "http://localhost:4200/password-reset/" + str(request.token),
             },
