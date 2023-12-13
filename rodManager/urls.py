@@ -73,6 +73,7 @@ urlpatterns = [
     path("api/gardeners/", include("rodManager.views.gardeners.urls")),
     path("api/meters/", include("rodManager.views.meters.urls")),
     path("api/password-reset/", include("rodManager.views.passwordreset.urls")),
+    path("api/gardeneirs/", include("rodManager.views.gardeners.urls")),
 ]
 
 if settings.DEBUG:
