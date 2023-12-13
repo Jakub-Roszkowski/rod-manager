@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rodManager.libs.rodpagitation import RODPagination
 from rodManager.dir_models.employee import Employee
 
-employers = [
+employees = [
     {
         'id': 1,
         'position': 'Manager',
@@ -59,8 +59,8 @@ class RODInfoApi(APIView):
         pagination_class = RODPagination
         paginator = RODPagination()
 
-        employers = paginator.paginate_queryset(Employee.objects.all, request)
-        return paginator.get_paginated_response(employers)
+        employees = paginator.paginate_queryset(Employee.objects.all(), request)
+        return paginator.get_paginated_response(employees)
         
 
     @swagger_auto_schema(
@@ -75,19 +75,25 @@ class RODInfoApi(APIView):
                 'email': openapi.Schema(type=openapi.TYPE_STRING)
             }
         ),
-        responses={201: "New employer added"},
+        responses={201: "New employee added"},
     )
     def post(self, request):
-        new_employer = request.data
+        new_employee = request.data
+        if not new_employee["position"]:
+            return Response({"error": "Position is required"}, status=status.HTTP_400_BAD_REQUEST)
+        if not new_employee["name"]:
+            return Response({"error": "Name is required"}, status=status.HTTP_400_BAD_REQUEST)
+        if not new_employee["phoneNumber"]:
+            return Response({"error": "Phone number is required"}, status=status.HTTP_400_BAD_REQUEST)
+        if not new_employee["email"]:
+            return Response({"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST)
+        Employee.objects.create(**new_employee)
+        return Response(new_employee, status=status.HTTP_201_CREATED)
 
-        employers.append(new_employer)
-        return Response(new_employer, status=status.HTTP_201_CREATED)
-
-class GardenInfoApiWithID(APIView):
     @swagger_auto_schema(
-        operation_summary="Update an existing employer",
+        operation_summary="Update an existing employee",
         manual_parameters=[
-            openapi.Parameter('employer_id', openapi.IN_PATH, description="Employer ID", type=openapi.TYPE_INTEGER)
+            openapi.Parameter('employee_id', openapi.IN_PATH, description="employee ID", type=openapi.TYPE_INTEGER)
         ],
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -99,16 +105,25 @@ class GardenInfoApiWithID(APIView):
                 'email': openapi.Schema(type=openapi.TYPE_STRING)
             }
         ),
-        responses={200: "Employer updated", 404: "Employer not found"},
+        responses={200: "employee updated", 404: "employee not found"},
     )
-    def put(self, request, employer_id):
-        for employer in employers:
-            if employer['id'] == employer_id:
-                updated_employer = request.data
-                employer.update(updated_employer)
-                return Response(employer, status=status.HTTP_200_OK)
+    def put(self, request, employee_id):
+        new_employee = request.data
+        if not Employee.objects.filter(id=employee_id).exists():
+            return Response({"error": "employee not found"}, status=status.HTTP_404_NOT_FOUND)
+        employee = Employee.objects.get(id=employee_id)
+        if new_employee["position"]:
+            employee.position = new_employee["position"]
+        if new_employee["name"]:
+            employee.name = new_employee["name"]
+        if new_employee["phoneNumber"]:
+            employee.phoneNumber = new_employee["phoneNumber"]
+        if new_employee["email"]:
+            employee.email = new_employee["email"]
+        employee.save()
+        
 
-        return Response({"error": "Employer not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"error": "employee not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 
