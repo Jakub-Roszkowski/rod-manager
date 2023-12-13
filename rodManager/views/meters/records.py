@@ -37,3 +37,49 @@ class RecordsCRUD(APIView):
         else:
             return Response({"error": "You don't have permission to view records."}, status=status.HTTP_403_FORBIDDEN)
 
+    @extend_schema(
+    summary="Create record",
+    request=RecordSerializer,
+    responses={
+        200: OpenApiResponse(
+            description="Record created.",
+            response=RecordSerializer,
+        ),
+    }
+    )
+    def post(self, request):
+        if  request.user.is_authenticated:
+            serializer = RecordSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response({"error": "Invalid data."}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"error": "You don't have permission to create records."}, status=status.HTTP_403_FORBIDDEN)
+        
+    @extend_schema(
+
+    summary="Delete record",
+    description="Delete record by id.",
+    parameters=[
+        OpenApiParameter(name="serial", type=OpenApiTypes.INT),
+    ],
+    responses={
+        200: OpenApiResponse(
+            description="Record deleted.",
+        ),
+    }
+    )
+    def delete(self, request, id):
+        if  request.user.is_authenticated:
+            try:
+                record = Record.objects.get(id=id)
+                record.delete()
+                return Response(status=status.HTTP_200_OK)
+            except Record.DoesNotExist:
+                return Response({"error": "Record not found."}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({"error": "You don't have permission to delete records."}, status=status.HTTP_403_FORBIDDEN)
+        
+    
