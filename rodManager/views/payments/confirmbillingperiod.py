@@ -43,6 +43,16 @@ class ConfirmBillingPeriodView(APIView):
                 {"error": "Billing period is already confirmed."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        # check if previous billing periods is confirmed
+        billingperiods = BillingPeriod.objects.filter(
+            start_date__lt=billingperiod.start_date
+        ).order_by("-start_date")
+        if billingperiods.exists():
+            if not billingperiods.first().is_confirmed:
+                return Response(
+                    {"error": "Previous billing period is not confirmed."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         if billingperiod.payment_date <= date.today():
             return Response(
                 {"error": "Payment date is in the past."},
