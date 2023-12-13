@@ -11,7 +11,7 @@ class Meter(models.Model):
     type = models.CharField(max_length=200)
     adress = models.CharField(max_length=200)
     garden = models.ForeignKey(
-        to="Garden", on_delete=models.CASCADE, null=True, blank=True
+        to="Garden", on_delete=models.DO_NOTHING, null=True, blank=True
     )
 
 

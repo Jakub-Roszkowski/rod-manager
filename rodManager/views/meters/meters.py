@@ -12,6 +12,7 @@ from rest_framework.views import APIView
 from rodManager.libs.rodpagitation import RODPagination 
 from rodManager.dir_models.meter import Meter, MeterLastRecordSerializer
 from rodManager.dir_models.record import Record, RecordSerializer
+from rodManager.dir_models.garden import Garden
 import datetime
 
 
@@ -87,7 +88,9 @@ class MetersCRUD(APIView):
             if request.data.get("adress"):
                 newmeter.adress = request.data["adress"]
             if request.data.get("garden"):
-                newmeter.garden = request.data["garden"]
+                if not Garden.objects.filter(id=request.data["garden"]).exists():
+                    return Response({"error": "Garden does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+                newmeter.garden = Garden.objects.get(id=request.data["garden"])
             if request.data.get("value"):
                 Record.objects.create(
                     meter=newmeter,
