@@ -27,7 +27,7 @@ class MeterLastRecordSerializer(serializers.ModelSerializer):
     value = serializers.SerializerMethodField()
 
     def get_value(self, obj):
-        return Record.objects.filter(meter=obj).order_by("-datetime")[0].value
+        return Record.objects.filter(meter=obj).order_by("-datetime")[0].value if Record.objects.filter(meter=obj).exists() else None
 
     class Meta:
         model = Meter
