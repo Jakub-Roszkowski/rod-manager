@@ -3,6 +3,6 @@ from rest_framework import serializers
 
 
 class PasswordReset(models.Model):
-    email = models.EmailField()
-    token = models.CharField(max_length=255)
+    user = models.ForeignKey("Account", on_delete=models.CASCADE)
+    token = models.UUIDField()
     valid_until = models.DateTimeField()

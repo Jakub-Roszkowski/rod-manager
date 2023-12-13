@@ -11,7 +11,7 @@ def send_mail_from_template(template_name, subject, to, data):
         with open(f"rodManager/template/email/{template_name}.txt") as f:
             simple_template = f.read()
     except FileNotFoundError:
-        return {"error": "Template not found"}
+        raise Exception("Template not found.")
     for key, value in data.items():
         placeholder = "{{" + key + "}}"
         template = template.replace(placeholder, value)
