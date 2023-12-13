@@ -67,7 +67,7 @@ class RecordsCRUD(APIView):
     summary="Delete record",
     description="Delete record by id.",
     parameters=[
-        OpenApiParameter(name="serial", type=OpenApiTypes.INT),
+        OpenApiParameter(name="id", type=OpenApiTypes.INT),
     ],
     responses={
         200: OpenApiResponse(

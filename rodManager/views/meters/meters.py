@@ -114,8 +114,7 @@ class MetersCRUD(APIView):
                 Record.objects.create(
                     meter=newmeter,
                     value=request.data["value"],
-                    date = datetime.date.today(),
-                    time = datetime.datetime.now().time()
+                    datetime = datetime.datetime.now()
                 )
             newmeter.save()
             return Response({"message": "Meter created."}, status=status.HTTP_201_CREATED)
