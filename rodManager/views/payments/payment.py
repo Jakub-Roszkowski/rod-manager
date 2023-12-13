@@ -54,7 +54,7 @@ class AddPaymentSerializer(serializers.ModelSerializer):
             user=validated_data["user"],
             type=validated_data["type"],
             date=validated_data["date"],
-            amount=validated_data["amount"],
+            amount=amount,
             description=validated_data["description"],
         )
         payment.save()
