@@ -121,9 +121,8 @@ class RODInfoApi(APIView):
         if new_employee["email"]:
             employee.email = new_employee["email"]
         employee.save()
-        
+        return Response(new_employee, status=status.HTTP_200_OK)
 
-        return Response({"error": "employee not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 
