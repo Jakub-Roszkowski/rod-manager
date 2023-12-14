@@ -36,3 +36,8 @@ class RODInfoDescriptionApi(APIView):
             return Response("ROD Description updated successfully", status=status.HTTP_200_OK)
         else:
             return Response("No new description provided", status=status.HTTP_400_BAD_REQUEST)
+        
+
+    def post(self, request):
+        RODGardens.objects.create(RODDescription="")
+        return Response("ROD Description created successfully", status=status.HTTP_201_CREATED)

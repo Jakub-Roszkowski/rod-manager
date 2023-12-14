@@ -50,11 +50,7 @@ class RODInfoApi(APIView):
         }
     )
     def get(self, request):
-        pagination_class = RODPagination
-        paginator = RODPagination()
-
-        employees = paginator.paginate_queryset(Employee.objects.all(), request)
-        return paginator.get_paginated_response(employees)
+        return Response(Employee.objects.all(), status=status.HTTP_200_OK)
         
 
     @extend_schema(
