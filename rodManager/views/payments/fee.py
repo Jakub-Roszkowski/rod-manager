@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from rodManager.dir_models.billingperiod import BillingPeriod
-from rodManager.dir_models.fee import Fee
+from rodManager.dir_models.fee import Fee, FeeCalculationType, FeeFeeType
 from rodManager.libs.rodpagitation import RODPagination
 from rodManager.users.validate import permission_required
 
@@ -31,9 +31,15 @@ class AddFeeSerializer(serializers.ModelSerializer):
     billing_period = serializers.PrimaryKeyRelatedField(
         queryset=BillingPeriod.objects.all()
     )
-    fee_type = serializers.CharField(required=True)
+    fee_type = serializers.ChoiceField(
+        choices=FeeFeeType.choices,
+        default=FeeFeeType.LEASE,
+    )
     name = serializers.CharField(required=True)
-    calculation_type = serializers.CharField(required=True)
+    calculation_type = serializers.ChoiceField(
+        choices=FeeCalculationType.choices,
+        default=FeeCalculationType.PERMETER,
+    )
     value = serializers.FloatField(required=True)
 
     class Meta:

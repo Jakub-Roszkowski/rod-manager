@@ -1,0 +1,2 @@
+W systemie pojawiło się nowe powiadomienie: 
+{{notification}}

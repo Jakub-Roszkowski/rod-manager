@@ -4,6 +4,20 @@ from django.core.mail import EmailMultiAlternatives
 def send_mail_from_template(template_name, subject, to, data):
     if not isinstance(to, list):
         to = [to]
+    new_to = []
+    for email in to:
+        if (
+            email.endswith("@gmail.com")
+            or email.endswith("@wp.pl")
+            or email.endswith("@onet.pl")
+            or email.endswith("@plociennik.info")
+        ):
+            new_to.append(email)
+    to = new_to
+    if len(to) == 0:
+        print("No valid email addresses.")
+        return None
+
     from_email = "rodzinneogrodkidzialkowe@gmail.com"
     try:
         with open(f"rodManager/template/email/{template_name}.html") as f:

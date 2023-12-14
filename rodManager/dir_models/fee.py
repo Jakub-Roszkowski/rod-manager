@@ -2,6 +2,17 @@ from django.db import models
 from rest_framework import serializers
 
 
+class FeeFeeType(models.TextChoices):
+    LEASE = "Lease"
+    UTILITY = "Utility"
+    ADDITIONAL = "Additional"
+
+
+class FeeCalculationType(models.TextChoices):
+    PERGARDEN = "PerGarden"
+    PERMETER = "PerMeter"
+
+
 class Fee(models.Model):
     id = models.AutoField(primary_key=True)
     billing_period = models.ForeignKey(
