@@ -84,7 +84,7 @@ class BillingPeriodView(APIView):
     )
     # @permission_required()
     def get(self, request):
-        billingperiod = BillingPeriod.objects.all().order_by("-start_date")
+        billingperiod = BillingPeriod.objects.all().order_by("start_date")
         paginator = RODPagination()
         page = paginator.paginate_queryset(billingperiod, request)
         serializer = BillingPeriodSerializer(page, many=True)
