@@ -19,6 +19,13 @@ python manage.py runserver
 - Install docker desktop: https://www.docker.com/products/docker-desktop
 - Have docker deamon running
 
+### Launch full app
+In the root folder of the project, run:
+```shell
+git submodule update --init --recursive
+docker-compose up -d --build 
+```
+
 ### Launch
 In the root folder of the project, run:
 ```shell

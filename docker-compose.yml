@@ -30,6 +30,14 @@ services:
       - 1337:1337
     depends_on:
       - web
+  angular-app:
+    build:
+      context: ./rod-manager-ui
+      dockerfile: Dockerfile
+    ports:
+      - "4200:80"  # Expose port 4200 (or any other port you wish to use)
+    depends_on:
+      - web # Replace with the name of your Django service
 
 volumes:
   postgres_data:

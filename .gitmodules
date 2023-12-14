@@ -1,5 +1,3 @@
-
-
 [submodule "rod-manager-ui"]
 	path = rod-manager-ui
 	url = https://github.com/keimil00/rod-manager-ui.git
