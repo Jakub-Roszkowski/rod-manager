@@ -78,6 +78,14 @@ class RODInfoApi(APIView):
 
     @extend_schema(
         summary="Edit employee",
+        parameters=[
+            OpenApiParameter(
+                name="employee_id",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description="employee_id",
+            ),
+        ],
         request=Employee,
         responses={
             200: OpenApiResponse(
@@ -86,7 +94,11 @@ class RODInfoApi(APIView):
             ),
         }
     )
-    def put(self, request, employee_id):
+
+
+    def put(self, request):
+        employee_id = request.query_params.get("employee_id")
+
         new_employee = request.data
         if not Employee.objects.filter(id=employee_id).exists():
             return Response({"error": "employee not found"}, status=status.HTTP_404_NOT_FOUND)
