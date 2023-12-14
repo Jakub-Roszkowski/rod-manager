@@ -234,3 +234,23 @@ class AnnouncementView(APIView):
                 {"error": "Title field is required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+    
+    def delete(self, request):
+        if request.data.get("id"):
+            announcement = Announcement.objects.filter(id=request.data["id"]).first()
+            if announcement:
+                announcement.delete()
+                return Response(
+                    {"success": "Announcement deleted successfully."},
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(
+                    {"error": "Announcement not found."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+        else:
+            return Response(
+                {"error": "Id field is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
