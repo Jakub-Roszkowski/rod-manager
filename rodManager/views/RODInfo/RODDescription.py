@@ -25,7 +25,7 @@ class RODInfoDescriptionApi(APIView):
         return Response(RODGardens.objects.first().RODDescription)
 
     @swagger_auto_schema(
-        operation_summary="Add a new new ROD Description",
+        operation_summary="Add a new ROD Description",
         request_body=openapi.Schema(
             type=openapi.TYPE_STRING, ),
     )

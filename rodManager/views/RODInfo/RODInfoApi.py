@@ -1,5 +1,7 @@
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes, OpenApiResponse
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -33,27 +35,19 @@ employees = [
 
 class RODInfoApi(APIView):
 
-    @swagger_auto_schema(
-        operation_summary="Get all employees",
-        operation_description="Returns a list of all employees.",
+    @extend_schema(
+        summary="Get employees",
+        description="Get all employees.",
+        parameters=[
+            OpenApiParameter(name="page", type=OpenApiTypes.INT),
+            OpenApiParameter(name="page_size", type=OpenApiTypes.INT),
+        ],
         responses={
-            200: openapi.Response(
-                description="List of all employees",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_ARRAY,
-                    items=openapi.Schema(
-                        type=openapi.TYPE_OBJECT,
-                        properties={
-                            'id': openapi.Schema(type=openapi.TYPE_INTEGER),
-                            'position': openapi.Schema(type=openapi.TYPE_STRING),
-                            'name': openapi.Schema(type=openapi.TYPE_STRING),
-                            'phoneNumber': openapi.Schema(type=openapi.TYPE_STRING),
-                            'email': openapi.Schema(type=openapi.TYPE_STRING),
-                        }
-                    )
-                )
+            200: OpenApiResponse(
+                description="Employee list.",
+                response=Employee,
             ),
-        },
+        }
     )
     def get(self, request):
         pagination_class = RODPagination
@@ -63,19 +57,15 @@ class RODInfoApi(APIView):
         return paginator.get_paginated_response(employees)
         
 
-    @swagger_auto_schema(
-        operation_summary="Add a new employee",
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                'id': openapi.Schema(type=openapi.TYPE_INTEGER),
-                'position': openapi.Schema(type=openapi.TYPE_STRING),
-                'name': openapi.Schema(type=openapi.TYPE_STRING),
-                'phoneNumber': openapi.Schema(type=openapi.TYPE_STRING),
-                'email': openapi.Schema(type=openapi.TYPE_STRING)
-            }
-        ),
-        responses={201: "New employee added"},
+    @extend_schema(
+        summary="Create employee",
+        request=Employee,
+        responses={
+            200: OpenApiResponse(
+                description="Employee created.",
+                response=Employee,
+            ),
+        }
     )
     def post(self, request):
         new_employee = request.data
@@ -90,22 +80,15 @@ class RODInfoApi(APIView):
         Employee.objects.create(**new_employee)
         return Response(new_employee, status=status.HTTP_201_CREATED)
 
-    @swagger_auto_schema(
-        operation_summary="Update an existing employee",
-        manual_parameters=[
-            openapi.Parameter('employee_id', openapi.IN_PATH, description="employee ID", type=openapi.TYPE_INTEGER)
-        ],
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                'id': openapi.Schema(type=openapi.TYPE_INTEGER),
-                'position': openapi.Schema(type=openapi.TYPE_STRING),
-                'name': openapi.Schema(type=openapi.TYPE_STRING),
-                'phoneNumber': openapi.Schema(type=openapi.TYPE_STRING),
-                'email': openapi.Schema(type=openapi.TYPE_STRING)
-            }
-        ),
-        responses={200: "employee updated", 404: "employee not found"},
+    @extend_schema(
+        summary="Edit employee",
+        request=Employee,
+        responses={
+            200: OpenApiResponse(
+                description="Employee edited.",
+                response=Employee,
+            ),
+        }
     )
     def put(self, request, employee_id):
         new_employee = request.data
@@ -122,6 +105,13 @@ class RODInfoApi(APIView):
             employee.email = new_employee["email"]
         employee.save()
         return Response(new_employee, status=status.HTTP_200_OK)
+    
+    def delete(self, request, employee_id):
+        if not Employee.objects.filter(id=employee_id).exists():
+            return Response({"error": "employee not found"}, status=status.HTTP_404_NOT_FOUND)
+        employee = Employee.objects.get(id=employee_id)
+        employee.delete()
+        return Response(status=status.HTTP_200_OK)
 
 
 
