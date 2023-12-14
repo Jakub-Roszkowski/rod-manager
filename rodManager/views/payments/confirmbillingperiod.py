@@ -1,9 +1,10 @@
 import threading
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 from django.db.models import F, Max, Q
 from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from drf_spectacular.utils import (
     OpenApiParameter,
     OpenApiResponse,
@@ -46,7 +47,7 @@ def add_payments_and_notifications(billingperiod):
         for fee in fees:
             if fee.calculation_type == FeeCalculationType.PERGARDEN:
                 addpayment(
-                    fee.value,
+                    fee.value * -1,
                     garden.leaseholderID,
                     'Opłata: "' + fee.name + '"',
                     PaymentType.PAYMENT,
@@ -54,7 +55,7 @@ def add_payments_and_notifications(billingperiod):
                 )
             elif fee.calculation_type == FeeCalculationType.PERMETER:
                 addpayment(
-                    fee.value * garden.area,
+                    fee.value * garden.area * -1,
                     garden.leaseholderID,
                     'Opłata: "' + fee.name + '"',
                     PaymentType.PAYMENT,
@@ -113,5 +114,6 @@ class ConfirmBillingPeriodView(APIView):
         thread.start()
         # TUTAJ DZIEJE SIĘ CAŁA MAGIA DOPISYWANIA UŻYTKOWNIKOM OPŁAT NA STANY KONT
         billingperiod.is_confirmed = True  # TODO odkomentować
+        billingperiod.confirmation_date = timezone.now()
         billingperiod.save()
         return Response(BillingPeriodSerializer(billingperiod).data)

@@ -1,18 +1,22 @@
+from datetime import datetime
 from enum import Enum
 
-from rest_framework import status
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from datetime import datetime
 
+from rodManager.dir_models.billingperiod import BillingPeriod
+from rodManager.dir_models.fee import Fee, FeeCalculationType, FeeFeeType
 from rodManager.dir_models.garden import Garden
+from rodManager.dir_models.payment import Payment, PaymentType
 
 
 class TypeOfFee(Enum):
     PerMeter = "Za metr"
     PerGardenPlot = "Za działkę"
+
 
 class MyGardenAPI(APIView):
     @swagger_auto_schema(
@@ -36,10 +40,12 @@ class MyGardenAPI(APIView):
                                 type=openapi.TYPE_OBJECT,
                                 properties={
                                     "name": openapi.Schema(type=openapi.TYPE_STRING),
-                                    "mediaConsumption": openapi.Schema(type=openapi.TYPE_STRING),
+                                    "mediaConsumption": openapi.Schema(
+                                        type=openapi.TYPE_STRING
+                                    ),
                                     "value": openapi.Schema(type=openapi.TYPE_INTEGER),
-                                }
-                            )
+                                },
+                            ),
                         ),
                         "leaseFees": openapi.Schema(
                             type=openapi.TYPE_ARRAY,
@@ -50,8 +56,8 @@ class MyGardenAPI(APIView):
                                     "type": openapi.Schema(type=openapi.TYPE_STRING),
                                     "value": openapi.Schema(type=openapi.TYPE_NUMBER),
                                     "sum": openapi.Schema(type=openapi.TYPE_INTEGER),
-                                }
-                            )
+                                },
+                            ),
                         ),
                         "utilityFees": openapi.Schema(
                             type=openapi.TYPE_ARRAY,
@@ -62,8 +68,8 @@ class MyGardenAPI(APIView):
                                     "type": openapi.Schema(type=openapi.TYPE_STRING),
                                     "value": openapi.Schema(type=openapi.TYPE_NUMBER),
                                     "sum": openapi.Schema(type=openapi.TYPE_INTEGER),
-                                }
-                            )
+                                },
+                            ),
                         ),
                         "additionalFees": openapi.Schema(
                             type=openapi.TYPE_ARRAY,
@@ -74,8 +80,8 @@ class MyGardenAPI(APIView):
                                     "type": openapi.Schema(type=openapi.TYPE_STRING),
                                     "value": openapi.Schema(type=openapi.TYPE_NUMBER),
                                     "sum": openapi.Schema(type=openapi.TYPE_INTEGER),
-                                }
-                            )
+                                },
+                            ),
                         ),
                         "individualFees": openapi.Schema(
                             type=openapi.TYPE_ARRAY,
@@ -84,23 +90,29 @@ class MyGardenAPI(APIView):
                                 properties={
                                     "name": openapi.Schema(type=openapi.TYPE_STRING),
                                     "value": openapi.Schema(type=openapi.TYPE_INTEGER),
-                                }
-                            )
+                                },
+                            ),
                         ),
                     },
-                    required=["sector", "avenue", "number", "area", "leaseholder", "value", "date"]
-                )
+                    required=[
+                        "sector",
+                        "avenue",
+                        "number",
+                        "area",
+                        "leaseholder",
+                        "value",
+                        "date",
+                    ],
+                ),
             ),
             400: openapi.Response(
                 description="Invalid request",
                 schema=openapi.Schema(
                     type=openapi.TYPE_OBJECT,
-                    properties={
-                        "error": openapi.Schema(type=openapi.TYPE_STRING)
-                    }
-                )
-            )
-        }
+                    properties={"error": openapi.Schema(type=openapi.TYPE_STRING)},
+                ),
+            ),
+        },
     )
     def get(self, request):
         garden = None
@@ -110,8 +122,124 @@ class MyGardenAPI(APIView):
             pass
         haveGarden = False
 
-        if (garden != None):
+        if garden != None:
             haveGarden = True
+        billing_periods = (
+            BillingPeriod.objects.filter(is_confirmed=True).order_by("-end_date").all()
+        )
+        billing_period = None
+        billing_period2 = None
+        date_from = None
+        if len(billing_periods) == 1:
+            billing_period = billing_periods[0]
+        elif len(billing_periods) > 1:
+            billing_period = billing_periods[0]
+            billing_period2 = billing_periods[1]
+            date_from = billing_period2.confimation_date
+
+        leaseFees = []
+        utilityFees = []
+        additionalFees = []
+        individualFees = []
+
+        if not date_from:
+            payments = Payment.objects.filter(user=request.user).exclude(
+                type=PaymentType.BILLPAYMENT
+            )
+        else:
+            payments = Payment.objects.filter(
+                user=request.user, date__gte=date_from
+            ).exclude(type=PaymentType.BILLPAYMENT)
+
+        for payment in payments:
+            print(payment.type)
+            if payment.related_fee:
+                if (
+                    payment.type == PaymentType.PAYMENT
+                    or payment.type == PaymentType.INDIVIDUAL
+                ):
+                    value = payment.related_fee.value
+                    sumvalue = payment.amount * -1
+                else:
+                    value = payment.related_fee.value * -1
+                    sumvalue = payment.amount
+                type = None
+                if payment.related_fee.calculation_type == FeeCalculationType.PERGARDEN:
+                    type = TypeOfFee.PerGardenPlot.value
+                elif (
+                    payment.related_fee.calculation_type == FeeCalculationType.PERMETER
+                ):
+                    type = TypeOfFee.PerMeter.value
+                if payment.related_fee.fee_type == FeeFeeType.LEASE:
+                    leaseFees.append(
+                        {
+                            "name": payment.related_fee.name,
+                            "type": type,
+                            "value": value,
+                            "sum": sumvalue,
+                        }
+                    )
+                elif payment.related_fee.fee_type == FeeFeeType.UTILITY:
+                    utilityFees.append(
+                        {
+                            "name": payment.related_fee.name,
+                            "type": type,
+                            "value": value,
+                            "sum": sumvalue,
+                        }
+                    )
+                elif payment.related_fee.fee_type == FeeFeeType.ADDITIONAL:
+                    additionalFees.append(
+                        {
+                            "name": payment.related_fee.name,
+                            "type": type,
+                            "value": value,
+                            "sum": sumvalue,
+                        }
+                    )
+            else:
+                value = payment.amount * -1
+                individualFees.append({"name": payment.description, "value": value})
+        print(leaseFees)
+        if leaseFees:
+            leaseFees.append(
+                {
+                    "name": "Razem",
+                    "type": None,
+                    "value": None,
+                    "sum": sum([fee["sum"] for fee in leaseFees]),
+                }
+            )
+        if utilityFees:
+            utilityFees.append(
+                {
+                    "name": "Razem",
+                    "type": None,
+                    "value": None,
+                    "sum": sum([fee["sum"] for fee in utilityFees]),
+                }
+            )
+        if additionalFees:
+            additionalFees.append(
+                {
+                    "name": "Razem",
+                    "type": None,
+                    "value": None,
+                    "sum": sum([fee["sum"] for fee in additionalFees]),
+                }
+            )
+        if individualFees:
+            individualFees.append(
+                {
+                    "name": "Razem",
+                    "value": sum([fee["value"] for fee in individualFees]),
+                }
+            )
+
+        balance = request.user.calculate_balance() * -1
+        if balance <= 0:
+            balance = 0
+            billing_period = None
 
         garden_plot_info = {
             "sector": garden.sector if haveGarden else None,
@@ -119,40 +247,18 @@ class MyGardenAPI(APIView):
             "number": garden.number if haveGarden else None,
             "area": garden.area if haveGarden else None,
             "leaseholder": request.user.first_name + " " + request.user.last_name,
-            # TODO: change value to real value from profile
-            "value": 3000,
-            "date": datetime(2024, 2, 7),
+            "value": balance,
+            "date": billing_period.payment_date if billing_period else None,
             # TODO: change mediaIndividual to real data from Counters and Payments
             "mediaIndividual": [
                 {"name": "Prąd", "mediaConsumption": "10 kW", "value": 200},
                 {"name": "Woda", "mediaConsumption": "10 m³", "value": 150},
-                {"name": "Razem", "mediaConsumption": None, "value": 350}
+                {"name": "Razem", "mediaConsumption": None, "value": 350},
             ],
-            # TODO: change mediaIndividual to real data from Payments
-            "leaseFees": [
-                {"name": "PZD", "type": TypeOfFee.PerMeter.value, "value": 0.12, "sum": 200},
-                {"name": "Opłata ogrodowa", "type": TypeOfFee.PerMeter.value, "value": 0.61, "sum": 200},
-                {"name": "Opłata Inwestycyjna", "type": TypeOfFee.PerMeter.value, "value": 0.5, "sum": 200},
-                {"name": "Razem", "type": None, "value": None, "sum": 600}
-            ],
-            # TODO: change mediaIndividual to real data from Counters and Payments
-            "utilityFees": [
-                {"name": "Prąd", "type": TypeOfFee.PerMeter.value, "value": 0.12, "sum": 200},
-                {"name": "Woda", "type": TypeOfFee.PerMeter.value, "value": 0.61, "sum": 200},
-                {"name": "Razem", "type": None, "value": None, "sum": 400}
-            ],
-            # TODO: change mediaIndividual to real data from Payments
-            "additionalFees": [
-                {"name": "Koszenie trawy", "type": TypeOfFee.PerGardenPlot.value, "value": 70, "sum": 200},
-                {"name": "Grabienie liści", "type": TypeOfFee.PerGardenPlot.value, "value": 40, "sum": 200},
-                {"name": "Razem", "type": None, "value": None, "sum": 400}
-            ],
-            # TODO: change mediaIndividual to real data from individual Payments
-            "individualFees": [
-                {"name": "Opłata za przekroczenie limitu wody", "value": 40},
-                {"name": "Opłata za opiekę nad roślinami w czasie urlopu", "value": 100},
-                {"name": "Razem", "value": 140}
-            ]
+            "leaseFees": leaseFees,
+            "utilityFees": utilityFees,
+            "additionalFees": additionalFees,
+            "individualFees": individualFees,
         }
 
         return Response(garden_plot_info, status=status.HTTP_200_OK)

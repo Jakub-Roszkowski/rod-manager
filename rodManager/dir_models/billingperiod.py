@@ -7,4 +7,4 @@ class BillingPeriod(models.Model):
     end_date = models.DateField()
     payment_date = models.DateField()
     is_confirmed = models.BooleanField(default=False)
-    confimation_date = models.DateTimeField(null=True, blank=True)
+    confirmation_date = models.DateTimeField(null=True, blank=True)
