@@ -32,6 +32,7 @@ def addpayment(amount, user, description, type, related_fee=None, date=date.toda
         date=date,
         amount=amount,
         description=description,
+        related_fee=related_fee,
     )
     payment.save()
     return payment
@@ -49,7 +50,7 @@ def add_payments_and_notifications(billingperiod):
                     garden.leaseholderID,
                     'Opłata: "' + fee.name + '"',
                     PaymentType.PAYMENT,
-                    fee,
+                    related_fee=fee,
                 )
             elif fee.calculation_type == FeeCalculationType.PERMETER:
                 addpayment(
@@ -57,7 +58,7 @@ def add_payments_and_notifications(billingperiod):
                     garden.leaseholderID,
                     'Opłata: "' + fee.name + '"',
                     PaymentType.PAYMENT,
-                    fee,
+                    related_fee=fee,
                 )
         add_notification(
             garden.leaseholderID,
