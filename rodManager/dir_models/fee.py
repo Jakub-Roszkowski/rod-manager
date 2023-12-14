@@ -9,8 +9,8 @@ class FeeFeeType(models.TextChoices):
 
 
 class FeeCalculationType(models.TextChoices):
-    PERGARDEN = "PerGarden"
-    PERMETER = "PerMeter"
+    PERGARDEN = "Za działkę"
+    PERMETER = "Za metr"
 
 
 class Fee(models.Model):
