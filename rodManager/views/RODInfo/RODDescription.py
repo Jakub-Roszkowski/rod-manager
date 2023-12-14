@@ -24,7 +24,7 @@ class RODInfoDescriptionApi(APIView):
         },
     )
     def get(self, request):
-        return Response(RODGardens.objects.first().RODDescription)
+        return Response(RODGardens.objects.all().first().RODDescription, status=status.HTTP_200_OK)
 
     @extend_schema(
         summary="Update ROD Description",
@@ -49,8 +49,9 @@ class RODInfoDescriptionApi(APIView):
     def put(self, request):
         new_description = request.data.get('description', None)
         if new_description:
-            RODGardens.objects.first().RODDescription = new_description
-            RODGardens.objects.first().save()
+            garden = RODGardens.objects.all().first()
+            garden.RODDescription = new_description
+            garden.save()
             return Response("ROD Description updated successfully", status=status.HTTP_200_OK)
         else:
             return Response("No new description provided", status=status.HTTP_400_BAD_REQUEST)
