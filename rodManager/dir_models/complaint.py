@@ -107,6 +107,7 @@ class ComplainsWithoutMassagesSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
     manager = serializers.SerializerMethodField()
     readed = serializers.SerializerMethodField()
+    submitter = serializers.SerializerMethodField()
 
     class Meta:
         model = Complaint
@@ -117,6 +118,7 @@ class ComplainsWithoutMassagesSerializer(serializers.ModelSerializer):
             "close_date",
             "last_update_date",
             "state",
+            "submitter",
             "user",
             "manager",
             "readed",
