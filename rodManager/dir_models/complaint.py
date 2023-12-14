@@ -144,3 +144,6 @@ class ComplainsWithoutMassagesSerializer(serializers.ModelSerializer):
                 return False
             else:
                 return True
+
+    def get_submitter(self, obj):
+        return obj.user.first_name + " " + obj.user.last_name
