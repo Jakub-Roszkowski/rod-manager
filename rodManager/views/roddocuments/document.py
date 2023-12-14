@@ -23,7 +23,12 @@ class RodDocumentPostSerializer(serializers.Serializer):
 class RodDocumentSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
-    file = serializers.FileField()
+    file = serializers.SerializerMethodField("get_file")
+
+    def get_file(self, obj):
+        if obj.file:
+            return "/" + obj.file.name
+        return None
 
 
 class RodDocumentView(APIView):

@@ -41,9 +41,14 @@ class AddPaymentSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        if validated_data["amount"] <= 0:
+        if (
+            validated_data["amount"] < 0
+            and validated_data["type"] != PaymentType.CORRECTION
+        ):
             raise serializers.ValidationError("Amount must be greater than 0.")
         amount = validated_data["amount"]
+        if validated_data["amount"] == 0:
+            raise serializers.ValidationError("Amount must be other than 0.")
         if (
             validated_data["type"] == PaymentType.INDIVIDUAL
             or validated_data["type"] == PaymentType.PAYMENT

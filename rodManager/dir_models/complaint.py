@@ -70,6 +70,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
 
 class ComplaintSerializer(serializers.ModelSerializer):
+    submitter = serializers.SerializerMethodField()
     user = serializers.SerializerMethodField()
     manager = serializers.SerializerMethodField()
     messages = MessageSerializer(many=True, read_only=True)
@@ -83,6 +84,7 @@ class ComplaintSerializer(serializers.ModelSerializer):
             "close_date",
             "last_update_date",
             "state",
+            "submitter",
             "user",
             "manager",
             "messages",
@@ -96,6 +98,9 @@ class ComplaintSerializer(serializers.ModelSerializer):
             return obj.manager.email
         else:
             return None
+
+    def get_submitter(self, obj):
+        return obj.user.first_name + " " + obj.user.last_name
 
 
 class ComplainsWithoutMassagesSerializer(serializers.ModelSerializer):
