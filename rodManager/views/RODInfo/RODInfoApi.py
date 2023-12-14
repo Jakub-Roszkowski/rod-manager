@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from rodManager.libs.rodpagitation import RODPagination
-from rodManager.dir_models.employee import Employee
+from rodManager.dir_models.employee import Employee, EmployeeSerializer
 
 employees = [
     {
@@ -50,7 +50,7 @@ class RODInfoApi(APIView):
         }
     )
     def get(self, request):
-        return Response(Employee.objects.all(), status=status.HTTP_200_OK)
+        return Response(EmployeeSerializer(Employee.objects.all(), many=True).data, status=status.HTTP_200_OK)
         
 
     @extend_schema(
