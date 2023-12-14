@@ -112,7 +112,7 @@ class MyGardenAPI(APIView):
     def get(self, request):
         garden = None
         try:
-            garden = Garden.objects.get(id=request.user.id)
+            garden = Garden.objects.get(leaseholderID=request.user)
         except Garden.DoesNotExist:
             pass
         haveGarden = False
