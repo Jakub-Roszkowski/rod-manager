@@ -3,6 +3,12 @@ from django.db import models
 from rodManager.dir_models.account import Account
 
 
+class NotificationType(models.TextChoices):
+    INFO = "Info"
+    WARNING = "Warning"
+    ERROR = "Error"
+
+
 class Notification(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey("Account", on_delete=models.CASCADE)
