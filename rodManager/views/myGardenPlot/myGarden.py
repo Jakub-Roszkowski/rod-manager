@@ -13,11 +13,6 @@ from rodManager.dir_models.garden import Garden
 from rodManager.dir_models.payment import Payment, PaymentType
 
 
-class TypeOfFee(Enum):
-    PerMeter = "Za metr"
-    PerGardenPlot = "Za działkę"
-
-
 class MyGardenAPI(APIView):
     @swagger_auto_schema(
         operation_summary="Get garden plot information",
@@ -165,11 +160,11 @@ class MyGardenAPI(APIView):
                     sumvalue = payment.amount
                 type = None
                 if payment.related_fee.calculation_type == FeeCalculationType.PERGARDEN:
-                    type = TypeOfFee.PerGardenPlot.value
+                    type = FeeCalculationType.PERGARDEN
                 elif (
                     payment.related_fee.calculation_type == FeeCalculationType.PERMETER
                 ):
-                    type = TypeOfFee.PerMeter.value
+                    type = FeeCalculationType.PERMETER
                 if payment.related_fee.fee_type == FeeFeeType.LEASE:
                     leaseFees.append(
                         {

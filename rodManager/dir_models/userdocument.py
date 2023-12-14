@@ -13,7 +13,7 @@ class UserDocument(models.Model):
     def to_dict(self):
         result = {"id": self.id, "name": self.name}
         if self.file:
-            result["file_url"] = self.file.url
+            result["file_url"] = "/" + self.file.name
         children = self.children.all()
         if children:
             result["items"] = [child.to_dict() for child in children]
