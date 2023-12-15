@@ -175,14 +175,23 @@ class MyGardenAPI(APIView):
                         }
                     )
                 elif payment.related_fee.fee_type == FeeFeeType.UTILITY:
-                    utilityFees.append(
-                        {
-                            "name": payment.related_fee.name,
-                            "type": type,
-                            "value": value,
-                            "sum": sumvalue,
-                        }
-                    )
+                    if payment.description.startswith("I"):
+                        mediaIndividualFees.append(
+                            {
+                                "name": payment.related_fee.name,
+                                "mediaConsumption": payment.description[1:],
+                                "value": value,
+                            }
+                        )
+                    else:
+                        utilityFees.append(
+                            {
+                                "name": payment.related_fee.name,
+                                "type": type,
+                                "value": value,
+                                "sum": sumvalue,
+                            }
+                        )
                 elif payment.related_fee.fee_type == FeeFeeType.ADDITIONAL:
                     additionalFees.append(
                         {
