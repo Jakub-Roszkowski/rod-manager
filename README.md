@@ -49,3 +49,8 @@ docker-compose -f docker-compose.prod.yml up -d --build
 docker-compose -f docker-compose.prod.yml down
 docker-compose -f docker-compose.prod.yml up -d --build  
 ```
+
+### EXPORT DATABASE TO FILE
+```shell
+python manage.py dumpdatautf8 --output data.json --exclude contenttypes --exclude auth.permission
+```
