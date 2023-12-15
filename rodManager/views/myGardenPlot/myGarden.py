@@ -179,7 +179,7 @@ class MyGardenAPI(APIView):
                         mediaIndividualFees.append(
                             {
                                 "name": payment.related_fee.name,
-                                "mediaConsumption": payment.description[1:],
+                                "mediaConsumption": payment.description,
                                 "value": value,
                             }
                         )
@@ -302,7 +302,7 @@ class MyGardenAPI(APIView):
             "number": garden.number if haveGarden else None,
             "area": garden.area if haveGarden else None,
             "leaseholder": request.user.first_name + " " + request.user.last_name,
-            "value": balance,
+            "value": round(balance, 2),
             "date": billing_period.payment_date if billing_period else None,
             "mediaIndividual": mediaIndividualFees,
             "leaseFees": leaseFees,
