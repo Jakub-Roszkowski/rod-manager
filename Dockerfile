@@ -10,7 +10,7 @@ ENV PYTHONUNBUFFERED 1
 RUN export MYSQLCLIENT_CFLAGS=`pkg-config mysqlclient --cflags`
 RUN export MYSQLCLIENT_LDFLAGS=`pkg-config mysqlclient --libs` 
 RUN apt-get update
-RUN apt-get install -y libmariadbclient-dev pkg-config python3-dev default-libmysqlclient-dev build-essential
+RUN apt-get install -y libmariadbclient-dev pkg-config python3-dev build-essential
 
 # install dependencies
 RUN pip install --upgrade pip
