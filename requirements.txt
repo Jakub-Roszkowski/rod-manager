@@ -9,3 +9,4 @@ google-auth==2.23.3
 psycopg2-binary==2.9.6
 gunicorn==21.2.0
 beautifulsoup4==4.12.2
+django-dump-load-utf8==0.0.4
