@@ -9,8 +9,8 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-from datetime import timedelta
 import os
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "drf_spectacular",
     "rodManager",
+    "django_dump_load_utf8",
 ]
 
 MIDDLEWARE = [
@@ -86,16 +87,12 @@ WSGI_APPLICATION = "management.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-        # },
-        # "postgres": {
-        #     "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-        #     "NAME": os.environ.get("SQL_DATABASE", BASE_DIR / "db.sqlite3"),
-        #     "USER": os.environ.get("SQL_USER", "user"),
-        #     "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
-        #     "HOST": os.environ.get("SQL_HOST", "localhost"),
-        #     "PORT": os.environ.get("SQL_PORT", "5432"),
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+        "NAME": os.environ.get("SQL_DATABASE", BASE_DIR / "db.sqlite3"),
+        "USER": os.environ.get("SQL_USER", "user"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+        "HOST": os.environ.get("SQL_HOST", "localhost"),
+        "PORT": os.environ.get("SQL_PORT", "5432"),
     }
 }
 
@@ -185,4 +182,4 @@ GOOGLE_CLIENT_ID = (
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
-    }
+}

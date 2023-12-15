@@ -11,15 +11,16 @@ services:
     env_file:
       - ./.env.dev
   db:
-    image: postgres:15
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    ports:
-      - 5432:5432
+    image: mariadb
     environment:
-      - POSTGRES_USER=hello_django
-      - POSTGRES_PASSWORD=hello_django
-      - POSTGRES_DB=hello_django_dev
+      - MYSQL_ROOT_PASSWORD=mariadb
+      - MYSQL_DATABASE=mariadb
+      - MYSQL_USER=mariadb
+      - MYSQL_PASSWORD=mariadb
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    ports:
+      - "3308:3306"
   nginx:
     build:
       context: ./nginx
@@ -40,5 +41,5 @@ services:
       - web # Replace with the name of your Django service
 
 volumes:
-  postgres_data:
+  mariadb_data:
   media_volume:
