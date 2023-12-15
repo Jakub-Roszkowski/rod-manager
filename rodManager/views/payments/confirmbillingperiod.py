@@ -88,10 +88,74 @@ def add_payments_and_notifications(billingperiod, previous_billingperiod, user):
                     if gardens_sum != 0:
                         if fee.name == "Woda":
                             value = rod_meters_water_sum / gardens_sum * fee.value
+                            if value > 0:
+                                addpayment(
+                                    round(value, 2) * -1,
+                                    garden.leaseholderID,
+                                    'Wspólna opłata: "' + fee.name + '"',
+                                    PaymentType.PAYMENT,
+                                    related_fee=fee,
+                                )
+
+                            my_meter = Meter.objects.filter(garden=garden, type="woda")
+
+                            if my_meter.exists():
+                                value = my_meter[0].calculate_usage(
+                                    billingperiod.confirmation_date,
+                                    previous_billingperiod_confirmation_date,
+                                )
+
+                                if value is not None and value > 0:
+                                    addpayment(
+                                        round(value, 2) * fee.value * -1,
+                                        garden.leaseholderID,
+                                        'Indywidualna opłata: "' + fee.name + '"',
+                                        PaymentType.PAYMENT,
+                                        related_fee=fee,
+                                    )
+
+                        elif fee.name == "Prąd":
+                            value = rod_meters_electricity_sum / gardens_sum * fee.value
 
                             if value > 0:
                                 addpayment(
-                                    value * -1,
+                                    round(value, 2) * -1,
+                                    garden.leaseholderID,
+                                    'Wspólna opłata: "' + fee.name + '"',
+                                    PaymentType.PAYMENT,
+                                    related_fee=fee,
+                                )
+
+                            my_meter = Meter.objects.filter(garden=garden, type="prąd")
+
+                            if my_meter.exists():
+                                value = my_meter[0].calculate_usage(
+                                    billingperiod.confirmation_date,
+                                    previous_billingperiod_confirmation_date,
+                                )
+
+                                if value is not None and value > 0:
+                                    addpayment(
+                                        round(value, 2) * fee.value * -1,
+                                        garden.leaseholderID,
+                                        'Indywidualna opłata: "' + fee.name + '"',
+                                        PaymentType.PAYMENT,
+                                        related_fee=fee,
+                                    )
+
+                elif fee.calculation_type == FeeCalculationType.PERMETER:
+                    if gardens_meters_sum != 0:
+                        if fee.name == "Woda":
+                            value = (
+                                rod_meters_water_sum
+                                * garden.area
+                                / gardens_meters_sum
+                                * fee.value
+                            )
+
+                            if value > 0:
+                                addpayment(
+                                    round(value, 2) * -1,
                                     garden.leaseholderID,
                                     'Wspólna opłata: "' + fee.name + '"',
                                     PaymentType.PAYMENT,
@@ -116,71 +180,6 @@ def add_payments_and_notifications(billingperiod, previous_billingperiod, user):
                                     )
 
                         elif fee.name == "Prąd":
-                            value = rod_meters_electricity_sum / gardens_sum * fee.value
-
-                            if value > 0:
-                                addpayment(
-                                    value * -1,
-                                    garden.leaseholderID,
-                                    'Opłata wspólna: "' + fee.name + '"',
-                                    PaymentType.PAYMENT,
-                                    related_fee=fee,
-                                )
-
-                            my_meter = Meter.objects.filter(garden=garden, type="prąd")
-
-                            if my_meter.exists():
-                                value = my_meter[0].calculate_usage(
-                                    billingperiod.confirmation_date,
-                                    previous_billingperiod_confirmation_date,
-                                )
-
-                                if value is not None and value > 0:
-                                    addpayment(
-                                        value * fee.value * -1,
-                                        garden.leaseholderID,
-                                        'Opłata indywidualna: "' + fee.name + '"',
-                                        PaymentType.PAYMENT,
-                                        related_fee=fee,
-                                    )
-
-                elif fee.calculation_type == FeeCalculationType.PERMETER:
-                    if gardens_meters_sum != 0:
-                        if fee.name == "Woda":
-                            value = (
-                                rod_meters_water_sum
-                                * garden.area
-                                / gardens_meters_sum
-                                * fee.value
-                            )
-
-                            if value > 0:
-                                addpayment(
-                                    value * -1,
-                                    garden.leaseholderID,
-                                    'Opłata wspólna: "' + fee.name + '"',
-                                    PaymentType.PAYMENT,
-                                    related_fee=fee,
-                                )
-
-                            my_meter = Meter.objects.filter(garden=garden, type="woda")
-
-                            if my_meter.exists():
-                                value = my_meter[0].calculate_usage(
-                                    billingperiod.confirmation_date,
-                                    previous_billingperiod_confirmation_date,
-                                )
-
-                                if value is not None and value > 0:
-                                    addpayment(
-                                        value * fee.value * -1,
-                                        garden.leaseholderID,
-                                        'Opłata indywidualna: "' + fee.name + '"',
-                                        PaymentType.PAYMENT,
-                                        related_fee=fee,
-                                    )
-
-                        elif fee.name == "Prąd":
                             value = (
                                 rod_meters_electricity_sum
                                 * garden.area
@@ -190,9 +189,9 @@ def add_payments_and_notifications(billingperiod, previous_billingperiod, user):
 
                             if value > 0:
                                 addpayment(
-                                    value * -1,
+                                    round(value, 2) * -1,
                                     garden.leaseholderID,
-                                    'Opłata wspólna: "' + fee.name + '"',
+                                    'Wspólna opłata: "' + fee.name + '"',
                                     PaymentType.PAYMENT,
                                     related_fee=fee,
                                 )
@@ -207,9 +206,9 @@ def add_payments_and_notifications(billingperiod, previous_billingperiod, user):
 
                                 if value is not None and value > 0:
                                     addpayment(
-                                        value * fee.value * -1,
+                                        round(value, 2) * fee.value * -1,
                                         garden.leaseholderID,
-                                        'Opłata indywidualna: "' + fee.name + '"',
+                                        'Indywidualna opłata: "' + fee.name + '"',
                                         PaymentType.PAYMENT,
                                         related_fee=fee,
                                     )
