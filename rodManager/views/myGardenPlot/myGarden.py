@@ -132,6 +132,7 @@ class MyGardenAPI(APIView):
             billing_period2 = billing_periods[1]
             date_from = billing_period2.confimation_date
 
+        mediaIndividualFees = []
         leaseFees = []
         utilityFees = []
         additionalFees = []
@@ -147,7 +148,6 @@ class MyGardenAPI(APIView):
             ).exclude(type=PaymentType.BILLPAYMENT)
 
         for payment in payments:
-            print(payment.type)
             if payment.related_fee:
                 if (
                     payment.type == PaymentType.PAYMENT
@@ -195,7 +195,24 @@ class MyGardenAPI(APIView):
             else:
                 value = payment.amount * -1
                 individualFees.append({"name": payment.description, "value": value})
-        print(leaseFees)
+
+        if mediaIndividualFees:
+            mediaIndividualFees.append(
+                {
+                    "name": "Razem",
+                    "mediaConsumption": None,
+                    "value": sum([fee["value"] for fee in mediaIndividualFees]),
+                }
+            )
+        else:
+            mediaIndividualFees.append(
+                {
+                    "name": "Razem",
+                    "mediaConsumption": None,
+                    "value": 0,
+                }
+            )
+
         if leaseFees:
             leaseFees.append(
                 {
@@ -203,6 +220,15 @@ class MyGardenAPI(APIView):
                     "type": None,
                     "value": None,
                     "sum": sum([fee["sum"] for fee in leaseFees]),
+                }
+            )
+        else:
+            leaseFees.append(
+                {
+                    "name": "Razem",
+                    "type": None,
+                    "value": None,
+                    "sum": 0,
                 }
             )
         if utilityFees:
@@ -214,6 +240,15 @@ class MyGardenAPI(APIView):
                     "sum": sum([fee["sum"] for fee in utilityFees]),
                 }
             )
+        else:
+            utilityFees.append(
+                {
+                    "name": "Razem",
+                    "type": None,
+                    "value": None,
+                    "sum": 0,
+                }
+            )
         if additionalFees:
             additionalFees.append(
                 {
@@ -223,11 +258,27 @@ class MyGardenAPI(APIView):
                     "sum": sum([fee["sum"] for fee in additionalFees]),
                 }
             )
+        else:
+            additionalFees.append(
+                {
+                    "name": "Razem",
+                    "type": None,
+                    "value": None,
+                    "sum": 0,
+                }
+            )
         if individualFees:
             individualFees.append(
                 {
                     "name": "Razem",
                     "value": sum([fee["value"] for fee in individualFees]),
+                }
+            )
+        else:
+            individualFees.append(
+                {
+                    "name": "Razem",
+                    "value": 0,
                 }
             )
 
@@ -244,12 +295,7 @@ class MyGardenAPI(APIView):
             "leaseholder": request.user.first_name + " " + request.user.last_name,
             "value": balance,
             "date": billing_period.payment_date if billing_period else None,
-            # TODO: change mediaIndividual to real data from Counters and Payments
-            "mediaIndividual": [
-                {"name": "Prąd", "mediaConsumption": "10 kW", "value": 200},
-                {"name": "Woda", "mediaConsumption": "10 m³", "value": 150},
-                {"name": "Razem", "mediaConsumption": None, "value": 350},
-            ],
+            "mediaIndividual": mediaIndividualFees,
             "leaseFees": leaseFees,
             "utilityFees": utilityFees,
             "additionalFees": additionalFees,
