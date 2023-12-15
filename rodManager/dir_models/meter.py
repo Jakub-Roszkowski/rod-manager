@@ -14,6 +14,31 @@ class Meter(models.Model):
         to="Garden", on_delete=models.DO_NOTHING, null=True, blank=True
     )
 
+    def calculate_usage(self, calculation_date, previous_calculation_date=None):
+        try:
+            previous_record = Record.objects.filter(
+                meter=self, datetime__lte=previous_calculation_date
+            ).order_by("-datetime")[0]
+        except:
+            try:
+                previous_record = Record.objects.filter(
+                    meter=self, datetime__lte=calculation_date
+                ).order_by("datetime")[0]
+            except:
+                previous_record = None
+
+        try:
+            current_record = Record.objects.filter(
+                meter=self, datetime__lte=calculation_date
+            ).order_by("-datetime")[0]
+        except:
+            current_record = None
+
+        if previous_record and current_record:
+            return current_record.value - previous_record.value
+        else:
+            return 0
+
 
 class MeterSerializer(serializers.ModelSerializer):
     garden = GardenSerializer()
@@ -27,7 +52,11 @@ class MeterLastRecordSerializer(serializers.ModelSerializer):
     value = serializers.SerializerMethodField()
 
     def get_value(self, obj):
-        return Record.objects.filter(meter=obj).order_by("-datetime")[0].value if Record.objects.filter(meter=obj).exists() else None
+        return (
+            Record.objects.filter(meter=obj).order_by("-datetime")[0].value
+            if Record.objects.filter(meter=obj).exists()
+            else None
+        )
 
     class Meta:
         model = Meter

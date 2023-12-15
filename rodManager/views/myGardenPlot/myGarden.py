@@ -123,14 +123,14 @@ class MyGardenAPI(APIView):
             BillingPeriod.objects.filter(is_confirmed=True).order_by("-end_date").all()
         )
         billing_period = None
-        billing_period2 = None
+        previous_billingperiod = None
         date_from = None
         if len(billing_periods) == 1:
             billing_period = billing_periods[0]
         elif len(billing_periods) > 1:
             billing_period = billing_periods[0]
-            billing_period2 = billing_periods[1]
-            date_from = billing_period2.confimation_date
+            previous_billingperiod = billing_periods[1]
+            date_from = previous_billingperiod.confimation_date
 
         mediaIndividualFees = []
         leaseFees = []
