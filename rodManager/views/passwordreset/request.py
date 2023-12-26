@@ -75,7 +75,7 @@ class PaswordResetRequestView(APIView):
                 "tomek@plociennik.info", "roszkolgaming@gmail.com"
             ],  # TODO zmienić maila na user.email, ale aktualnie maile to np. admin@admin.admin więc nie działa
             {
-                "link": "http://localhost:4200/password-reset/" + str(request.token),
+                "link": "http://rodmanager.ddns.net:1337/password-reset/" + str(request.token),
             },
         )
         return Response({"ok": "Request created successfully."})
